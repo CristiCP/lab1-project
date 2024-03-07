@@ -2,20 +2,20 @@ import { useState } from "react";
 import Player from "./Player";
 
 interface Props {
-  onUpdatePlayer: () => void;
+  setOn: React.Dispatch<React.SetStateAction<boolean>>;
   players: Player[];
   index: number;
 }
 
-function UpdatePlayer({ onUpdatePlayer, players, index }: Props) {
+function UpdatePlayer({ setOn, players, index }: Props) {
   const handleCloseButton = () => {
-    onUpdatePlayer();
+    setOn(false);
   };
 
   const handleUpdateButton = () => {
     if (club) {
       players[index].setTeam(club);
-      onUpdatePlayer();
+      setOn(false);
     }
   };
 

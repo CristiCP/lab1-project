@@ -2,10 +2,10 @@ import { useState } from "react";
 import Player from "./Player";
 
 interface Props {
-  onAddPlayer: (newPlayer: Player) => void;
+  setPlayersList: React.Dispatch<React.SetStateAction<Player[]>>;
 }
 
-function NewPlayer({ onAddPlayer }: Props) {
+function NewPlayer({ setPlayersList }: Props) {
   const [name, setName] = useState("");
   const [nationality, setNationality] = useState("");
   const [team, setTeam] = useState("");
@@ -18,7 +18,7 @@ function NewPlayer({ onAddPlayer }: Props) {
         alert("Age should be a number!");
       } else {
         const newPlayer = new Player(name, nationality, team, ageNumber);
-        onAddPlayer(newPlayer);
+        setPlayersList((prevPlayersList) => [...prevPlayersList, newPlayer]);
       }
     } else {
       alert("Complete all details!");

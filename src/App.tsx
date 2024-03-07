@@ -16,39 +16,21 @@ function App() {
     setPlayersList([player1, player2, player3]);
   }, []);
 
-  const addPlayer = (newPlayer: Player) => {
-    setPlayersList((prevPlayersList) => [...prevPlayersList, newPlayer]);
-  };
-
-  const deletePlayer = (newPlayers: Player[]) => {
-    setPlayersList(newPlayers);
-    if (isOn === true) {
-      setOn(false);
-    }
-  };
-
-  const updatePlayerDialog = (index: number) => {
-    setSelectedIndex(index);
-    setOn(true);
-  };
-
-  const closeUpdatePlayerDialog = () => {
-    setOn(false);
-  };
-
   return (
     <div>
       <h1>Footballers List</h1>
       <div className="container">
-        <NewPlayer onAddPlayer={addPlayer}></NewPlayer>
+        <NewPlayer setPlayersList={setPlayersList}></NewPlayer>
         <PlayersList
           players={playersList}
-          onDeletePlayer={deletePlayer}
-          onUpdatePlayer={updatePlayerDialog}
+          setPlayersList={setPlayersList}
+          isOn={isOn}
+          setOn={setOn}
+          setSelectedIndex={setSelectedIndex}
         ></PlayersList>
         {isOn && (
           <UpdatePlayer
-            onUpdatePlayer={closeUpdatePlayerDialog}
+            setOn={setOn}
             players={playersList}
             index={selectedIndex}
           ></UpdatePlayer>

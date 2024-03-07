@@ -2,18 +2,30 @@ import Player from "./Player";
 
 interface Props {
   players: Player[];
-  onDeletePlayer: (newPlayers: Player[]) => void;
-  onUpdatePlayer: (index: number) => void;
+  setPlayersList: React.Dispatch<React.SetStateAction<Player[]>>;
+  isOn: boolean;
+  setOn: React.Dispatch<React.SetStateAction<boolean>>;
+  setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
 }
 
-function PlayersList({ players, onDeletePlayer, onUpdatePlayer }: Props) {
+function PlayersList({
+  players,
+  setPlayersList,
+  isOn,
+  setOn,
+  setSelectedIndex,
+}: Props) {
   function handleDeleteButton(index: number) {
     const updatedPlayers = players.filter((_, i) => i !== index);
-    onDeletePlayer(updatedPlayers);
+    setPlayersList(updatedPlayers);
+    if (isOn === true) {
+      setOn(false);
+    }
   }
 
   const handleUpdateButton = (index: number) => {
-    onUpdatePlayer(index);
+    setSelectedIndex(index);
+    setOn(true);
   };
 
   return (
