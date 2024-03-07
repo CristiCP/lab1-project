@@ -2,15 +2,19 @@ import NewPlayer from "./NewPlayer";
 import PlayersList from "./PlayersList";
 import Player from "./Player";
 import UpdatePlayer from "./UpdatePlayer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
-  const player1 = new Player("Ronaldo", "Portugal", "Al-Nassr", 39);
-  const player2 = new Player("Messi", "Argentine", "Inter Miami", 36);
-  const player3 = new Player("Coman", "Romanian", "FCSB", 25);
-  const [playersList, setPlayersList] = useState([player1, player2, player3]);
+  const [playersList, setPlayersList] = useState<Player[]>([]);
   const [isOn, setOn] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+
+  useEffect(() => {
+    const player1 = new Player("Ronaldo", "Portugal", "Al-Nassr", 39);
+    const player2 = new Player("Messi", "Argentine", "Inter Miami", 36);
+    const player3 = new Player("Coman", "Romanian", "FCSB", 25);
+    setPlayersList([player1, player2, player3]);
+  }, []);
 
   const addPlayer = (newPlayer: Player) => {
     setPlayersList((prevPlayersList) => [...prevPlayersList, newPlayer]);
