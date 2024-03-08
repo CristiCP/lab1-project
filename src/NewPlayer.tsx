@@ -28,38 +28,38 @@ function NewPlayer({ setPlayersList }: Props) {
   return (
     <div className="new-player">
       <h2>Player Details</h2>
-      <section>
+      <form>
         <input
           className="Name"
           type="text"
           placeholder="Enter name..."
           onChange={(e) => setName(e.target.value)}
         ></input>
-      </section>
-      <section>
+      </form>
+      <form>
         <input
           className="Nationality"
           type="text"
           placeholder="Enter nationality..."
           onChange={(e) => setNationality(e.target.value)}
         ></input>
-      </section>
-      <section>
+      </form>
+      <form>
         <input
           className="Team"
           type="text"
           placeholder="Enter club..."
           onChange={(e) => setTeam(e.target.value)}
         ></input>
-      </section>
-      <section>
+      </form>
+      <form>
         <input
           className="Age"
           type="text"
           placeholder="Enter age..."
           onChange={(e) => setAge(e.target.value)}
         ></input>
-      </section>
+      </form>
       <button className="add-button" onClick={handleAddButton}>
         Add player
       </button>
