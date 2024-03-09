@@ -1,35 +1,75 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
-import Player from "./Player";
 
 interface Props {
   setOn: React.Dispatch<React.SetStateAction<boolean>>;
-  players: Player[];
-  index: number;
+  idPlayer: number;
+  clubPlayer: string;
+  setNewData: React.Dispatch<
+    React.SetStateAction<
+      {
+        name: string;
+        country: string;
+        team: string;
+        age: string;
+        id: number;
+      }[]
+    >
+  >;
 }
 
-function UpdatePlayer({ setOn, players, index }: Props) {
+interface PlayerData {
+  name: string;
+  country: string;
+  team: string;
+  age: string;
+  id: number;
+}
+
+function UpdatePlayer({ setOn, idPlayer, clubPlayer, setNewData }: Props) {
+  const [data, setData] = useState<PlayerData | null>(null);
+  const [club, setClub] = useState(clubPlayer);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/users/" + idPlayer)
+      .then((res) => setData(res.data))
+      .catch((e) => console.log(e));
+  }, []);
+
+  useEffect(() => {
+    setClub(clubPlayer);
+  }, [clubPlayer]);
+
   const handleCloseButton = () => {
-    console.log("dsda");
     setOn(false);
   };
 
   const handleUpdateButton = () => {
     if (club) {
-      players[index].setTeam(club);
+      const values = {
+        name: data?.name,
+        country: data?.country,
+        team: club,
+        age: data?.age,
+        id: data?.id,
+      };
+      axios
+        .put("http://localhost:3000/users/" + idPlayer, values)
+        .catch((e) => console.log(e));
+      axios
+        .get("http://localhost:3000/users")
+        .then((res) => setNewData(res.data))
+        .catch((e) => console.log(e));
       setOn(false);
     }
   };
-
-  const [club, setClub] = useState(players[index].getTeam().toString());
-  useEffect(() => {
-    setClub(players[index].getTeam().toString());
-  }, [index]);
 
   return (
     <div className="update-content">
       <h2>New club:</h2>
       <section>
-        {index !== -1 && (
+        {idPlayer !== -1 && (
           <input
             className="Team"
             type="text"

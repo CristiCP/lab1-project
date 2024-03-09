@@ -1,35 +1,42 @@
-import React from "react";
-import Player from "./Player";
+import { useEffect, useState } from "react";
 import UpdatePlayer from "./UpdatePlayer";
+import axios from "axios";
 
-interface Props {
-  players: Player[];
-  setPlayersList: React.Dispatch<React.SetStateAction<Player[]>>;
-  isOn: boolean;
-  setOn: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedIndex: number;
-  setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
-}
+function ListPage() {
+  const [data, setData] = useState<
+    Array<{
+      name: string;
+      country: string;
+      team: string;
+      age: string;
+      id: number;
+    }>
+  >([]);
+  const [isOn, setOn] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [selectedClub, setSelectedClub] = useState("");
 
-function ListPage({
-  players,
-  setPlayersList,
-  isOn,
-  setOn,
-  selectedIndex,
-  setSelectedIndex,
-}: Props) {
-  function handleDeleteButton(index: number) {
-    const updatedPlayers = players.filter((_, i) => i !== index);
-    setPlayersList(updatedPlayers);
-    if (isOn === true) {
-      setOn(false);
-    }
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/users")
+      .then((res) => setData(res.data))
+      .catch((e) => console.log(e));
+  }, []);
+
+  function handleDeleteButton(id: number) {
+    axios.delete("http://localhost:3000/users/" + id).then(() =>
+      axios
+        .get("http://localhost:3000/users")
+        .then((res) => setData(res.data))
+        .catch((e) => console.log(e))
+    );
+    setOn(false);
   }
 
-  const handleUpdateButton = (index: number) => {
-    setSelectedIndex(index);
+  const handleUpdateButton = (playerId: number, team: string) => {
     setOn(true);
+    setSelectedIndex(playerId);
+    setSelectedClub(team);
   };
 
   return (
@@ -37,35 +44,35 @@ function ListPage({
       <div className="players-list">
         <h2>Players List</h2>
         <ul>
-          {players.map((player, index) => (
+          {data.map((player: any, index: number) => (
             <li key={index}>
               <strong>
                 Name:
-                {" " + player.getName() + " "}
+                {" " + player["name"] + " "}
               </strong>
               <strong>
                 Country:
-                {" " + player.getNationality() + " "}
+                {" " + player["country"] + " "}
               </strong>
               <strong>
                 Club:
-                {" " + player.getTeam() + " "}
+                {" " + player["team"] + " "}
               </strong>
               <strong>
                 Age:
-                {" " + player.getAge()}
+                {" " + player["age"] + " "}
               </strong>
               <button
                 className="delete-button"
                 onClick={() => {
-                  handleDeleteButton(index);
+                  handleDeleteButton(player["id"]);
                 }}
               >
                 Delete
               </button>
               <button
                 className="update-button"
-                onClick={() => handleUpdateButton(index)}
+                onClick={() => handleUpdateButton(player["id"], player["team"])}
               >
                 Update
               </button>
@@ -77,8 +84,9 @@ function ListPage({
         {isOn && (
           <UpdatePlayer
             setOn={setOn}
-            players={players}
-            index={selectedIndex}
+            idPlayer={selectedIndex}
+            clubPlayer={selectedClub}
+            setNewData={setData}
           ></UpdatePlayer>
         )}
       </div>

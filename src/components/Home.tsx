@@ -1,12 +1,8 @@
-import React, { useState } from "react";
-import Player from "./Player";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
-interface Props {
-  setPlayersList: React.Dispatch<React.SetStateAction<Player[]>>;
-}
-
-function Home({ setPlayersList }: Props) {
+function Home() {
   const [name, setName] = useState("");
   const [nationality, setNationality] = useState("");
   const [team, setTeam] = useState("");
@@ -19,8 +15,13 @@ function Home({ setPlayersList }: Props) {
       if (isNaN(ageNumber)) {
         alert("Age should be a number!");
       } else {
-        const newPlayer = new Player(name, nationality, team, ageNumber);
-        setPlayersList((prevPlayersList) => [...prevPlayersList, newPlayer]);
+        const jPlayer = {
+          name: name,
+          country: nationality,
+          team: team,
+          age: age,
+        };
+        axios.post("http://localhost:3000/users", jPlayer);
         setConfirmation(true);
         setTimeout(() => {
           setConfirmation((prevConfirmation) => {

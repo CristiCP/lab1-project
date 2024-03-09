@@ -1,0 +1,11 @@
+{
+  "users": [
+    {
+      "name": "Cristi Popan",
+      "country": "Romania",
+      "team": "Cfr Cluj",
+      "age": "20",
+      "id": 1
+    }
+  ]
+}
