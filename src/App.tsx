@@ -1,8 +1,9 @@
-import NewPlayer from "./NewPlayer";
-import PlayersList from "./PlayersList";
-import Player from "./Player";
-import UpdatePlayer from "./UpdatePlayer";
 import { useEffect, useState } from "react";
+import Home from "./components/Home";
+import ListPage from "./components/ListPage";
+import Player from "./components/Player";
+import "./inxdex.css";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 function App() {
   const [playersList, setPlayersList] = useState<Player[]>([]);
@@ -11,32 +12,33 @@ function App() {
 
   useEffect(() => {
     const player1 = new Player("Ronaldo", "Portugal", "Al-Nassr", 39);
-    const player2 = new Player("Messi", "Argentine", "Inter Miami", 36);
-    const player3 = new Player("Coman", "Romanian", "FCSB", 25);
+    const player2 = new Player("Messi", "Argentina", "Inter Miami", 36);
+    const player3 = new Player("Coman", "Romania", "FCSB", 25);
     setPlayersList([player1, player2, player3]);
   }, []);
 
   return (
-    <div>
-      <h1>Footballers List</h1>
-      <div className="container">
-        <NewPlayer setPlayersList={setPlayersList}></NewPlayer>
-        <PlayersList
-          players={playersList}
-          setPlayersList={setPlayersList}
-          isOn={isOn}
-          setOn={setOn}
-          setSelectedIndex={setSelectedIndex}
-        ></PlayersList>
-        {isOn && (
-          <UpdatePlayer
-            setOn={setOn}
-            players={playersList}
-            index={selectedIndex}
-          ></UpdatePlayer>
-        )}
-      </div>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={<Home setPlayersList={setPlayersList}></Home>}
+        ></Route>
+        <Route
+          path="/list"
+          element={
+            <ListPage
+              players={playersList}
+              setPlayersList={setPlayersList}
+              isOn={isOn}
+              setOn={setOn}
+              selectedIndex={selectedIndex}
+              setSelectedIndex={setSelectedIndex}
+            ></ListPage>
+          }
+        ></Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

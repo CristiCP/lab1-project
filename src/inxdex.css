@@ -1,0 +1,157 @@
+body {
+    background-color: rgb(59, 63, 73);
+}
+
+.new-player {
+  margin-top: 100px;
+}
+
+h2 {
+    color: white;
+    text-align: left;
+    font-size: 50px;
+    margin-top: 10px;
+    margin-bottom: 0px;
+}
+
+input[type='text'] {
+    color: black;
+    text-align: left;
+    font-size: 25px;
+    border-radius: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 10px;
+}
+
+.new-player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.buttons-add-show {
+    display: flex;
+    padding: 10px;
+    margin-left: 8px;
+    justify-content: space-evenly;
+}
+
+.add-button {
+  color: white;
+  background-color: rgba(3, 230, 15, 0.897);
+  border: 0cap;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 30px;
+  padding: 10px;
+  font-weight: bold;
+}
+
+.add-button:hover {
+  background-color: rgba(13, 97, 17, 0.897);
+}
+
+.show-button {
+  margin: 0 5px;
+  color: white;
+  background-color: rgba(72, 69, 235, 0.897);
+  border: 0cap;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 30px;
+  padding: 10px;
+  text-decoration: none;
+  display: inline-block;
+  cursor:default;
+  width: 150px;
+}
+
+.show-button:hover {
+  background-color: rgba(21, 19, 131, 0.897);
+}
+
+.confirmation-div {
+    color: white;
+    text-align: left;
+    font-weight: bold;
+    font-size: 30px;
+    padding: 10px;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-bottom: 0px;
+  }
+
+  .delete-button {
+    color: white;
+    background-color: red;
+    border: 0cap;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 30px;
+    padding: 10px;
+    margin-top: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .delete-button:hover {
+    background-color: rgb(131, 18, 18);
+  }
+
+.update-button {
+    color: white;
+    background-color: rgb(8, 106, 235);
+    border: 0cap;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 30px;
+    padding: 10px;
+    margin-top: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .update-button:hover {
+    background-color: rgba(21, 19, 131, 0.897);
+  }
+
+ul {
+  width: 800px;
+  display: flex;
+  flex-direction: column;
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+    background-color: rgb(79, 77, 83);
+    display: flex;
+    flex-direction: column;
+    font-size: 30px;
+    color:white;
+    border: 2px solid white;
+    border-radius: 5px;
+    margin-top: 10px;
+    padding: 10px;
+    padding-bottom: 20px;
+    font-weight: bold;
+  }
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.update-content {
+  width: 100%;
+  margin: 0;
+}
+
+@media (max-width: 850px) {
+  ul {
+    width: 100%; 
+  }
+}
