@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import UpdatePlayer from "./UpdatePlayer";
 import axios from "axios";
+import CountryImage from "./CountryImage";
 
 function ListPage() {
   const [data, setData] = useState<
@@ -40,42 +41,49 @@ function ListPage() {
   };
 
   return (
-    <strong className="container">
+    <div className="container">
       <div className="players-list">
         <h2>Players List</h2>
         <ul>
           {data.map((player: any, index: number) => (
-            <li key={index}>
-              <strong>
-                Name:
-                {" " + player["name"] + " "}
-              </strong>
-              <strong>
-                Country:
-                {" " + player["country"] + " "}
-              </strong>
-              <strong>
-                Club:
-                {" " + player["team"] + " "}
-              </strong>
-              <strong>
-                Age:
-                {" " + player["age"] + " "}
-              </strong>
-              <button
-                className="delete-button"
-                onClick={() => {
-                  handleDeleteButton(player["id"]);
-                }}
-              >
-                Delete
-              </button>
-              <button
-                className="update-button"
-                onClick={() => handleUpdateButton(player["id"], player["team"])}
-              >
-                Update
-              </button>
+            <li key={index} className="player-item">
+              <div className="player-info">
+                <strong>
+                  Name:
+                  {" " + player["name"] + " "}
+                </strong>
+                <strong>
+                  Country:
+                  {" " + player["country"] + " "}
+                </strong>
+                <strong>
+                  Club:
+                  {" " + player["team"] + " "}
+                </strong>
+                <strong>
+                  Age:
+                  {" " + player["age"] + " "}
+                </strong>
+              </div>
+              <div className="country-image">
+                <CountryImage country={player["country"]} />
+              </div>
+              <div className="player-buttons">
+                <button
+                  className="delete-button"
+                  onClick={() => handleDeleteButton(player["id"])}
+                >
+                  Delete
+                </button>
+                <button
+                  className="update-button"
+                  onClick={() =>
+                    handleUpdateButton(player["id"], player["team"])
+                  }
+                >
+                  Update
+                </button>
+              </div>
             </li>
           ))}
         </ul>
@@ -87,10 +95,10 @@ function ListPage() {
             idPlayer={selectedIndex}
             clubPlayer={selectedClub}
             setNewData={setData}
-          ></UpdatePlayer>
+          />
         )}
       </div>
-    </strong>
+    </div>
   );
 }
 
