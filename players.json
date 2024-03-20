@@ -1,67 +1,39 @@
 {
   "users": [
     {
-      "name": "Cristi Popan",
-      "country": "Romania",
-      "team": "fc real",
-      "age": "20",
-      "id": 1
-    },
-    {
-      "name": "dorian",
-      "country": "jffj",
-      "team": "hjhjj",
-      "age": "20",
-      "id": 2
-    },
-    {
-      "name": "dsa",
-      "country": "Romania",
-      "team": "das",
-      "age": "3",
+      "name": "Kane",
+      "country": "United Kingdom",
+      "team": "Bayern",
+      "age": "30",
       "id": 3
     },
     {
-      "name": "dsa",
+      "name": "Cristi Popan",
       "country": "Romania",
-      "team": "das",
-      "age": "3",
+      "team": "Real Madrid",
+      "age": "20",
       "id": 4
     },
     {
-      "name": "dsa",
-      "country": "Romania",
-      "team": "das",
-      "age": "3",
+      "name": "Pop Dorian",
+      "country": "Brazil",
+      "team": "Real Madrid",
+      "age": "16",
       "id": 5
     },
     {
-      "name": "dsa",
-      "country": "Romania",
-      "team": "das",
-      "age": "3",
+      "name": "Cristiano Ronaldo",
+      "country": "Portugal",
+      "team": "Al-Nassr",
+      "age": "39",
       "id": 6
     },
     {
-      "name": "dsa",
-      "country": "Romania",
-      "team": "das",
-      "age": "3",
-      "id": 7
-    },
-    {
-      "name": "dsa",
-      "country": "Romania",
-      "team": "das",
-      "age": "3",
+      "name": "Pop Cristi",
+      "country": "Micronesia, Federated States Of",
+      "team": "Bistrita FC",
+      "age": "20",
       "id": 8
-    },
-    {
-      "name": "dsa",
-      "country": "France",
-      "team": "das",
-      "age": "3",
-      "id": 9
     }
   ]
 }
