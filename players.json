@@ -1,6 +1,7 @@
 {
   "users": [
     {
+<<<<<<< HEAD
       "name": "Erling Haaland",
       "country": "Norway",
       "team": "Manchester City",
@@ -13,6 +14,41 @@
       "team": "Real Madrid",
       "age": "23",
       "id": 6
+=======
+      "name": "Kane",
+      "country": "United Kingdom",
+      "team": "Bayern",
+      "age": "30",
+      "id": 3
+    },
+    {
+      "name": "Cristi Popan",
+      "country": "Romania",
+      "team": "Real Madrid",
+      "age": "20",
+      "id": 4
+    },
+    {
+      "name": "Pop Dorian",
+      "country": "Brazil",
+      "team": "Real Madrid",
+      "age": "16",
+      "id": 5
+    },
+    {
+      "name": "Cristiano Ronaldo",
+      "country": "Portugal",
+      "team": "Al-Nassr",
+      "age": "39",
+      "id": 6
+    },
+    {
+      "name": "Pop Cristi",
+      "country": "Micronesia, Federated States Of",
+      "team": "Bistrita FC",
+      "age": "20",
+      "id": 8
+>>>>>>> b7ac50336b90248cc06e022134b55a599d488e1b
     }
   ]
 }
