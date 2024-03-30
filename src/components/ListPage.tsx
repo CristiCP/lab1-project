@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import UpdatePlayer from "./UpdatePlayer";
 import axios from "axios";
 import CountryImage from "./CountryImage";
+import Export from "./Export";
+import DeleteAll from "./DeleteAll";
 
 function ListPage() {
   const [data, setData] = useState<
@@ -16,6 +18,7 @@ function ListPage() {
   const [isOn, setOn] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [selectedClub, setSelectedClub] = useState("");
+  const [selectedPlayers, setSelectedPlayers] = useState<number[]>([]);
 
   useEffect(() => {
     axios
@@ -38,6 +41,17 @@ function ListPage() {
     setOn(true);
     setSelectedIndex(playerId);
     setSelectedClub(team);
+  };
+
+  const handleCheckboxChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    playerId: number
+  ) => {
+    if (event.target.checked) {
+      setSelectedPlayers([...selectedPlayers, playerId]);
+    } else {
+      setSelectedPlayers(selectedPlayers.filter((id) => id !== playerId));
+    }
   };
 
   return (
@@ -83,20 +97,41 @@ function ListPage() {
                 >
                   Update
                 </button>
+                <div className="player-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={selectedPlayers.includes(player["id"])}
+                    onChange={(event) =>
+                      handleCheckboxChange(event, player["id"])
+                    }
+                  />
+                </div>
               </div>
             </li>
           ))}
         </ul>
       </div>
-      <div className="update-entity">
-        {isOn && (
-          <UpdatePlayer
-            setOn={setOn}
-            idPlayer={selectedIndex}
-            clubPlayer={selectedClub}
-            setNewData={setData}
-          />
-        )}
+      <div className="buttons-container">
+        <div className="update-entity">
+          {isOn && (
+            <UpdatePlayer
+              setOn={setOn}
+              idPlayer={selectedIndex}
+              clubPlayer={selectedClub}
+              setNewData={setData}
+            />
+          )}
+        </div>
+        <div className="export-entity">
+          <Export></Export>
+        </div>
+        <div className="delete-all-entity">
+          <DeleteAll
+            playersDelete={selectedPlayers}
+            setData={setData}
+            setSelectedPlayers={setSelectedPlayers}
+          ></DeleteAll>
+        </div>
       </div>
     </div>
   );

@@ -165,3 +165,56 @@ li {
     width: 100%; 
   }
 }
+
+.buttons-container {
+  margin-top: 70px;
+}
+
+.buttons-container > * {
+  margin-bottom: 30px;
+}
+
+.export-button {
+  color: white;
+  background-color: rgba(40, 165, 214, 0.897);
+  border: 0cap;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 30px;
+  padding: 10px;
+  font-weight: bold;
+}
+
+.export-button:hover {
+  cursor: pointer;
+  background-color: rgba(44, 111, 138, 0.897);
+}
+
+.delete-all-button {
+  color: white;
+  background-color: red;
+  border: 0cap;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 30px;
+  padding: 10px;
+  font-weight: bold;
+}
+
+.delete-all-button:hover {
+  background-color: rgb(131, 18, 18);
+}
+
+.player-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.player-checkbox {
+  margin-left: auto;
+}
+
+.player-checkbox input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+}
