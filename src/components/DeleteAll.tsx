@@ -20,9 +20,9 @@ interface Props {
 function DeleteAll({ playersDelete, setData, setSelectedPlayers }: Props) {
   const handleDeleteAll = () => {
     playersDelete.forEach((id) => {
-      axios.delete(`http://localhost:3000/users/${id}`).then(() =>
+      axios.delete(`http://localhost:4000/players/${id}`).then(() =>
         axios
-          .get("http://localhost:3000/users")
+          .get("http://localhost:4000/players")
           .then((res) => setData(res.data))
           .catch((e) => console.log(e))
       );

@@ -18,29 +18,41 @@ function ListPage() {
   const [isOn, setOn] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [selectedClub, setSelectedClub] = useState("");
+  const [selectedName, setSelectedName] = useState("");
+  const [selectedAge, setSelectedAge] = useState(-1);
+  const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedPlayers, setSelectedPlayers] = useState<number[]>([]);
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/users")
+      .get("http://localhost:4000/players")
       .then((res) => setData(res.data))
       .catch((e) => console.log(e));
   }, []);
 
   function handleDeleteButton(id: number) {
-    axios.delete("http://localhost:3000/users/" + id).then(() =>
+    axios.delete("http://localhost:4000/players/" + id).then(() =>
       axios
-        .get("http://localhost:3000/users")
+        .get("http://localhost:4000/players")
         .then((res) => setData(res.data))
         .catch((e) => console.log(e))
     );
     setOn(false);
   }
 
-  const handleUpdateButton = (playerId: number, team: string) => {
+  const handleUpdateButton = (
+    playerId: number,
+    name: string,
+    country: string,
+    team: string,
+    age: number
+  ) => {
     setOn(true);
     setSelectedIndex(playerId);
     setSelectedClub(team);
+    setSelectedName(name);
+    setSelectedCountry(country);
+    setSelectedAge(age);
   };
 
   const handleCheckboxChange = (
@@ -92,7 +104,13 @@ function ListPage() {
                 <button
                   className="update-button"
                   onClick={() =>
-                    handleUpdateButton(player["id"], player["team"])
+                    handleUpdateButton(
+                      player["id"],
+                      player["name"],
+                      player["country"],
+                      player["team"],
+                      player["age"]
+                    )
                   }
                 >
                   Update
@@ -117,7 +135,10 @@ function ListPage() {
             <UpdatePlayer
               setOn={setOn}
               idPlayer={selectedIndex}
+              namePlayer={selectedName}
+              countryPlayer={selectedCountry}
               clubPlayer={selectedClub}
+              agePlayer={selectedAge}
               setNewData={setData}
             />
           )}

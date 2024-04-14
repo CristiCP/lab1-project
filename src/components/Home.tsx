@@ -21,7 +21,7 @@ function Home() {
           team: team,
           age: age,
         };
-        axios.post("http://localhost:3000/users", jPlayer);
+        axios.post("http://localhost:4000/players", jPlayer);
         setConfirmation(true);
         setTimeout(() => {
           setConfirmation((prevConfirmation) => {

@@ -1,0 +1,32 @@
+{
+  "users": [
+    {
+      "name": "Cristiano Ronaldo",
+      "country": "Portugal",
+      "team": "Al-Nassr",
+      "age": "39",
+      "id": 2
+    },
+    {
+      "name": "Popan Iosif-Cristian",
+      "country": "Romania",
+      "team": "Real Madrid",
+      "age": "20",
+      "id": 3
+    },
+    {
+      "name": "Kane",
+      "country": "United Kingdom",
+      "team": "Bayen",
+      "age": "31",
+      "id": 4
+    },
+    {
+      "name": "Candet Andrei",
+      "country": "Romania",
+      "team": "?",
+      "age": "24",
+      "id": 6
+    }
+  ]
+}

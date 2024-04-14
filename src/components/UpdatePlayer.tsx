@@ -4,7 +4,10 @@ import React, { useEffect, useState } from "react";
 interface Props {
   setOn: React.Dispatch<React.SetStateAction<boolean>>;
   idPlayer: number;
+  namePlayer: string;
+  countryPlayer: string;
   clubPlayer: string;
+  agePlayer: number;
   setNewData: React.Dispatch<
     React.SetStateAction<
       {
@@ -18,28 +21,28 @@ interface Props {
   >;
 }
 
-interface PlayerData {
-  name: string;
-  country: string;
-  team: string;
-  age: string;
-  id: number;
-}
-
-function UpdatePlayer({ setOn, idPlayer, clubPlayer, setNewData }: Props) {
-  const [data, setData] = useState<PlayerData | null>(null);
+function UpdatePlayer({
+  setOn,
+  idPlayer,
+  namePlayer,
+  countryPlayer,
+  clubPlayer,
+  agePlayer,
+  setNewData,
+}: Props) {
   const [club, setClub] = useState(clubPlayer);
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:3000/users/" + idPlayer)
-      .then((res) => setData(res.data))
-      .catch((e) => console.log(e));
-  }, []);
+  const [selectedIdPlayer, setSelectedIdPlayer] = useState(idPlayer);
+  const [selectedName, setSelectedName] = useState(namePlayer);
+  const [selectedAge, setSelectedAge] = useState(agePlayer);
+  const [selectedCountry, setSelectedCountry] = useState(countryPlayer);
 
   useEffect(() => {
     setClub(clubPlayer);
-  }, [clubPlayer]);
+    setSelectedIdPlayer(idPlayer);
+    setSelectedName(namePlayer);
+    setSelectedAge(agePlayer);
+    setSelectedCountry(countryPlayer);
+  }, [idPlayer]);
 
   const handleCloseButton = () => {
     setOn(false);
@@ -48,18 +51,20 @@ function UpdatePlayer({ setOn, idPlayer, clubPlayer, setNewData }: Props) {
   const handleUpdateButton = () => {
     if (club) {
       const values = {
-        name: data?.name,
-        country: data?.country,
+        name: selectedName,
+        country: selectedCountry,
         team: club,
-        age: data?.age,
-        id: data?.id,
+        age: selectedAge,
+        id: selectedIdPlayer,
       };
       axios
-        .put("http://localhost:3000/users/" + idPlayer, values)
-        .catch((e) => console.log(e));
-      axios
-        .get("http://localhost:3000/users")
-        .then((res) => setNewData(res.data))
+        .put("http://localhost:4000/players/" + idPlayer, values)
+        .then(() =>
+          axios
+            .get("http://localhost:4000/players")
+            .then((res) => setNewData(res.data))
+            .catch((e) => console.log(e))
+        )
         .catch((e) => console.log(e));
       setOn(false);
     }

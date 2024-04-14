@@ -11,7 +11,7 @@ interface UserData {
 function Export() {
   let exportAction = () => {
     axios
-      .get("http://localhost:3000/users")
+      .get("http://localhost:4000/players")
       .then((res) => {
         const csvData = res.data
           .map(
