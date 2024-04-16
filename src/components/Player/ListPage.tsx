@@ -1,20 +1,16 @@
 import { useEffect, useState } from "react";
 import UpdatePlayer from "./UpdatePlayer";
 import axios from "axios";
-import CountryImage from "./CountryImage";
+import CountryImage from "../CountryImage";
 import Export from "./Export";
 import DeleteAll from "./DeleteAll";
+import stores from "../../storage/StorageZustand";
+const { usePlayerStore } = stores;
+import io from "socket.io-client";
+
+const socket = io("http://localhost:4000");
 
 function ListPage() {
-  const [data, setData] = useState<
-    Array<{
-      name: string;
-      country: string;
-      team: string;
-      age: string;
-      id: number;
-    }>
-  >([]);
   const [isOn, setOn] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [selectedClub, setSelectedClub] = useState("");
@@ -22,21 +18,45 @@ function ListPage() {
   const [selectedAge, setSelectedAge] = useState(-1);
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedPlayers, setSelectedPlayers] = useState<number[]>([]);
+  const { players, setPlayers, addPlayer } = usePlayerStore();
 
   useEffect(() => {
-    axios
-      .get("http://localhost:4000/players")
-      .then((res) => setData(res.data))
-      .catch((e) => console.log(e));
+    const fetchData = () => {
+      axios
+        .get("http://localhost:4000/players")
+        .then((res) => setPlayers(res.data))
+        .catch((e) => {
+          if (e.message == "Network Error") {
+            console.log("Backend is down! Retrying in 7 seconds...");
+            alert("Backend is down!Please wait...");
+            setTimeout(fetchData, 7000);
+          } else {
+            alert("Error on getting players");
+          }
+        });
+      socket.on("newEntity", (newPlayer) => {
+        addPlayer(newPlayer);
+        console.log("New player added!");
+      });
+    };
+    fetchData();
   }, []);
 
   function handleDeleteButton(id: number) {
-    axios.delete("http://localhost:4000/players/" + id).then(() =>
-      axios
-        .get("http://localhost:4000/players")
-        .then((res) => setData(res.data))
-        .catch((e) => console.log(e))
-    );
+    axios
+      .delete("http://localhost:4000/players/" + id)
+      .then(() =>
+        axios
+          .get("http://localhost:4000/players")
+          .then((res) => setPlayers(res.data))
+          .catch((e) => console.log(e))
+      )
+      .catch((e) => {
+        console.log(e);
+        alert(
+          "Error!Player could not be deleted or was already deleted!Please refresh the page!"
+        );
+      });
     setOn(false);
   }
 
@@ -71,7 +91,7 @@ function ListPage() {
       <div className="players-list">
         <h2>Players List</h2>
         <ul>
-          {data.map((player: any, index: number) => (
+          {players.map((player: any, index: number) => (
             <li key={index} className="player-item">
               <div className="player-info">
                 <strong>
@@ -139,7 +159,6 @@ function ListPage() {
               countryPlayer={selectedCountry}
               clubPlayer={selectedClub}
               agePlayer={selectedAge}
-              setNewData={setData}
             />
           )}
         </div>
@@ -149,7 +168,6 @@ function ListPage() {
         <div className="delete-all-entity">
           <DeleteAll
             playersDelete={selectedPlayers}
-            setData={setData}
             setSelectedPlayers={setSelectedPlayers}
           ></DeleteAll>
         </div>

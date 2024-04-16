@@ -33,7 +33,7 @@ input[type='text'] {
 .buttons-add-show {
     display: flex;
     padding: 10px;
-    margin-left: 8px;
+    margin-left: 0px;
     justify-content: space-evenly;
 }
 
@@ -64,7 +64,6 @@ input[type='text'] {
   text-decoration: none;
   display: inline-block;
   cursor:default;
-  width: 150px;
 }
 
 .show-button:hover {

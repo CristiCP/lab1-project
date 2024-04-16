@@ -1,5 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import stores from "../../storage/StorageZustand";
+const { usePlayerStore } = stores;
 
 interface Props {
   setOn: React.Dispatch<React.SetStateAction<boolean>>;
@@ -8,17 +10,6 @@ interface Props {
   countryPlayer: string;
   clubPlayer: string;
   agePlayer: number;
-  setNewData: React.Dispatch<
-    React.SetStateAction<
-      {
-        name: string;
-        country: string;
-        team: string;
-        age: string;
-        id: number;
-      }[]
-    >
-  >;
 }
 
 function UpdatePlayer({
@@ -28,13 +19,13 @@ function UpdatePlayer({
   countryPlayer,
   clubPlayer,
   agePlayer,
-  setNewData,
 }: Props) {
   const [club, setClub] = useState(clubPlayer);
   const [selectedIdPlayer, setSelectedIdPlayer] = useState(idPlayer);
   const [selectedName, setSelectedName] = useState(namePlayer);
   const [selectedAge, setSelectedAge] = useState(agePlayer);
   const [selectedCountry, setSelectedCountry] = useState(countryPlayer);
+  const { setPlayers } = usePlayerStore();
 
   useEffect(() => {
     setClub(clubPlayer);
@@ -62,10 +53,15 @@ function UpdatePlayer({
         .then(() =>
           axios
             .get("http://localhost:4000/players")
-            .then((res) => setNewData(res.data))
+            .then((res) => setPlayers(res.data))
             .catch((e) => console.log(e))
         )
-        .catch((e) => console.log(e));
+        .catch((e) => {
+          console.log(e);
+          alert(
+            "Error!Player could not be updated or does not exist anymore!Please refresh the page!"
+          );
+        });
       setOn(false);
     }
   };

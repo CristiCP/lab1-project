@@ -26,7 +26,10 @@ function Export() {
 
         saveAs(blob, "list.csv");
       })
-      .catch((e) => console.log(e));
+      .catch((e) => {
+        console.log(e);
+        alert("Error!Please refresh the page!");
+      });
   };
 
   return (
