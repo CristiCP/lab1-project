@@ -1,16 +1,20 @@
 module.exports = function(db) {
     return {
-        getAllTeams: function(req,res) {
+        getAllTeams: function(req, res) {
             console.log("Getting all teams...");
-            db.query('SELECT * FROM teams', (error, results) => {
+            let { sortBy, order } = req.query; 
+            sortBy = sortBy || 'name';
+            order = order && order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+            const sql = `SELECT * FROM teams ORDER BY ${sortBy} ${order}`;
+            db.query(sql, (error, results) => {
                 if (error) {
-                  res.status(500).json("Server error");
-                  console.log("Server error!!!");
-              };
-              res.json(results);
-              res.status(200);
-              console.log("All teams sent successfully.")
-              });
+                    res.status(500).json("Server error");
+                    console.log("Server error!!!");
+                    return;
+                }
+                res.json(results);
+                console.log("All teams sent successfully.");
+            });
         },
         getTeamByName: function(req,res) {
             const { name } = req.params;
