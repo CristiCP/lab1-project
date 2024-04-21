@@ -13,21 +13,40 @@ function TeamsListPage() {
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
 
+  const fetchData = () => {
+    axios
+      .get("http://localhost:4000/teams")
+      .then(() => {
+        return Promise.all([
+          addTeamsFromLocalStorage(),
+          deleteTeamsFromLocalStorage(),
+        ]);
+      })
+      .then(() => {
+        getTeams();
+      })
+      .catch((e) => {
+        if (e.message == "Network Error") {
+          const localTeams = JSON.parse(localStorage.getItem("teams") || "[]");
+          setTeams(localTeams);
+          setTimeout(fetchData, 7000);
+        } else {
+          alert("Error on getting players");
+        }
+      });
+  };
+
+  const getTeams = () => {
+    axios
+      .get("http://localhost:4000/teams")
+      .then((res) => {
+        setTeams(res.data);
+        localStorage.setItem("teams", JSON.stringify(res.data));
+      })
+      .catch((e) => console.log(e));
+  };
+
   useEffect(() => {
-    const fetchData = () => {
-      axios
-        .get("http://localhost:4000/teams")
-        .then((res) => setTeams(res.data))
-        .catch((e) => {
-          if (e.message == "Network Error") {
-            console.log("Backend is down! Retrying in 7 seconds...");
-            alert("Backend is down!Please wait...");
-            setTimeout(fetchData, 7000);
-          } else {
-            alert("Error on getting players");
-          }
-        });
-    };
     fetchData();
   }, []);
 
@@ -37,14 +56,42 @@ function TeamsListPage() {
       .then(() =>
         axios
           .get("http://localhost:4000/teams")
-          .then((res) => setTeams(res.data))
+          .then((res) => {
+            setTeams(res.data);
+            localStorage.setItem("teams", JSON.stringify(res.data));
+          })
           .catch((e) => console.log(e))
       )
       .catch((e) => {
-        console.log(e);
-        alert(
-          "Error!Team could not be deleted or was already deleted!Please refresh the page!"
-        );
+        if (e.message == "Network Error") {
+          const storedTeams = JSON.parse(localStorage.getItem("teams") || "[]");
+          const updatedStoredTeams = storedTeams.filter(
+            (team: any) => team.name !== name
+          );
+          localStorage.setItem("teams", JSON.stringify(updatedStoredTeams));
+
+          const newTeams = JSON.parse(localStorage.getItem("newTeams") || "[]");
+          const updatedNewTeams = newTeams.filter(
+            (team: any) => team.name !== name
+          );
+          localStorage.setItem("newTeams", JSON.stringify(updatedNewTeams));
+
+          const isNameInNewTeams = newTeams.some(
+            (team: any) => team.name === name
+          );
+          if (!isNameInNewTeams) {
+            const deletedTeams = JSON.parse(
+              localStorage.getItem("deletedTeams") || "[]"
+            );
+            deletedTeams.push(name);
+            localStorage.setItem("deletedTeams", JSON.stringify(deletedTeams));
+          }
+          fetchData();
+        } else {
+          alert(
+            "Error!Team could not be deleted or was already deleted!Please refresh the page!"
+          );
+        }
       });
     setOn(false);
   }
@@ -64,6 +111,36 @@ function TeamsListPage() {
       setSelectedTeams([...selectedTeams, teamName]);
     } else {
       setSelectedTeams(selectedTeams.filter((name) => name !== teamName));
+    }
+  };
+
+  const addTeamsFromLocalStorage = () => {
+    const newTeams = JSON.parse(localStorage.getItem("newTeams") || "[]");
+    if (newTeams.length > 0) {
+      for (const newTeam of newTeams) {
+        try {
+          axios.post("http://localhost:4000/teams", newTeam);
+        } catch (error) {
+          console.error("Error adding new team:", error);
+        }
+      }
+      localStorage.removeItem("newTeams");
+    }
+  };
+
+  const deleteTeamsFromLocalStorage = () => {
+    const deletedTeams = JSON.parse(
+      localStorage.getItem("deletedTeams") || "[]"
+    );
+    if (deletedTeams.length > 0) {
+      for (const deletedTeam of deletedTeams) {
+        try {
+          axios.delete("http://localhost:4000/teams/" + deletedTeam);
+        } catch (error) {
+          console.error("Error deleting team:", error);
+        }
+      }
+      localStorage.removeItem("deletedTeams");
     }
   };
 
@@ -140,6 +217,7 @@ function TeamsListPage() {
             <DeleteAllTeams
               teamsDelete={selectedTeams}
               setSelectedTeams={setSelectedTeams}
+              fetchData={fetchData}
             ></DeleteAllTeams>
           </div>
         }

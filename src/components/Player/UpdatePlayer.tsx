@@ -10,6 +10,13 @@ interface Props {
   countryPlayer: string;
   clubPlayer: string;
   agePlayer: number;
+  fetchData: () => void;
+}
+
+interface Team {
+  name: string;
+  country: string;
+  year: number;
 }
 
 function UpdatePlayer({
@@ -19,6 +26,7 @@ function UpdatePlayer({
   countryPlayer,
   clubPlayer,
   agePlayer,
+  fetchData,
 }: Props) {
   const [club, setClub] = useState(clubPlayer);
   const [selectedIdPlayer, setSelectedIdPlayer] = useState(idPlayer);
@@ -53,14 +61,64 @@ function UpdatePlayer({
         .then(() =>
           axios
             .get("http://localhost:4000/players")
-            .then((res) => setPlayers(res.data))
+            .then((res) => {
+              setPlayers(res.data);
+              localStorage.setItem("players", JSON.stringify(res.data));
+            })
             .catch((e) => console.log(e))
         )
         .catch((e) => {
-          console.log(e);
-          alert(
-            "Error!Player could not be updated or does not exist anymore!Please refresh the page!"
-          );
+          if (e.message == "Network Error") {
+            const storedTeams = JSON.parse(
+              localStorage.getItem("teams") || "[]"
+            );
+            let teamExists = false;
+            storedTeams.forEach((storedTeam: Team) => {
+              if (storedTeam.name === values.team) {
+                teamExists = true;
+              }
+            });
+            if (teamExists) {
+              const storedPlayers = JSON.parse(
+                localStorage.getItem("players") || "[]"
+              );
+              const updatedPlayers = JSON.parse(
+                localStorage.getItem("updatedPlayers") || "[]"
+              );
+              const playerIndex = storedPlayers.findIndex(
+                (player: any) => player.id === values.id
+              );
+              if (playerIndex !== -1) {
+                storedPlayers[playerIndex] = values;
+                localStorage.setItem("players", JSON.stringify(storedPlayers));
+                updatedPlayers.push(values);
+                localStorage.setItem(
+                  "updatedPlayers",
+                  JSON.stringify(updatedPlayers)
+                );
+              }
+
+              const newPlayers = JSON.parse(
+                localStorage.getItem("newPlayers") || "[]"
+              );
+              const playerNewIndex = newPlayers.findIndex(
+                (player: any) => player.id === values.id
+              );
+              if (playerNewIndex !== -1) {
+                newPlayers[playerNewIndex] = values;
+                localStorage.setItem("newPlayers", JSON.stringify(newPlayers));
+              }
+              fetchData();
+            } else {
+              alert("Team does not exist!");
+            }
+          } else if (e.response && e.response.status === 404) {
+            alert("Team does not exist!");
+          } else {
+            alert(
+              "Error!Player could not be updated or does not exist anymore!Please refresh the page!"
+            );
+          }
         });
       setOn(false);
     }

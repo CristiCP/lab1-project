@@ -2,6 +2,12 @@ import axios from "axios";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
+interface Team {
+  name: string;
+  country: string;
+  year: number;
+}
+
 function AddPlayer() {
   const [name, setName] = useState("");
   const [nationality, setNationality] = useState("");
@@ -15,7 +21,9 @@ function AddPlayer() {
       if (isNaN(ageNumber)) {
         alert("Age should be a number!");
       } else {
+        const currentTime = new Date().getTime();
         const jPlayer = {
+          id: currentTime,
           name: name,
           country: nationality,
           team: team,
@@ -37,8 +45,37 @@ function AddPlayer() {
           .catch((e) => {
             if (e.response && e.response.status === 404) {
               alert("Team does not exist!");
-            } else {
-              alert("Server error! Please try again later.");
+            } else if (e.message === "Network Error") {
+              const storedTeams = JSON.parse(
+                localStorage.getItem("teams") || "[]"
+              );
+              let teamExists = false;
+              storedTeams.forEach((storedTeam: Team) => {
+                if (storedTeam.name === team) {
+                  teamExists = true;
+                }
+              });
+              if (teamExists) {
+                const storedPlayers = JSON.parse(
+                  localStorage.getItem("newPlayers") || "[]"
+                );
+                storedPlayers.push(jPlayer);
+                localStorage.setItem(
+                  "newPlayers",
+                  JSON.stringify(storedPlayers)
+                );
+                const players = JSON.parse(
+                  localStorage.getItem("players") || "[]"
+                );
+                players.push(jPlayer);
+                localStorage.setItem("players", JSON.stringify(players));
+                setConfirmation(true);
+                setTimeout(() => {
+                  setConfirmation(false);
+                }, 2000);
+              } else {
+                alert("Team does not exist!");
+              }
             }
           });
       }

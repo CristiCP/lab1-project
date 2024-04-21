@@ -6,9 +6,10 @@ const { usePlayerStore } = stores;
 interface Props {
   playersDelete: number[];
   setSelectedPlayers: React.Dispatch<React.SetStateAction<number[]>>;
+  fetchData: () => void;
 }
 
-function DeleteAll({ playersDelete, setSelectedPlayers }: Props) {
+function DeleteAll({ playersDelete, setSelectedPlayers, fetchData }: Props) {
   const { setPlayers } = usePlayerStore();
 
   const handleDeleteAll = () => {
@@ -18,12 +19,53 @@ function DeleteAll({ playersDelete, setSelectedPlayers }: Props) {
         .then(() =>
           axios
             .get("http://localhost:4000/players")
-            .then((res) => setPlayers(res.data))
+            .then((res) => {
+              setPlayers(res.data);
+              localStorage.setItem("players", JSON.stringify(res.data));
+            })
             .catch((e) => console.log(e))
         )
         .catch((e) => {
-          console.log(e);
-          alert("Error!Please refresh the page!");
+          if (e.message == "Network Error") {
+            const storedPlayers = JSON.parse(
+              localStorage.getItem("players") || "[]"
+            );
+            const updatedStoredPlayers = storedPlayers.filter(
+              (player: any) => player.id !== id
+            );
+            localStorage.setItem(
+              "players",
+              JSON.stringify(updatedStoredPlayers)
+            );
+
+            const newPlayers = JSON.parse(
+              localStorage.getItem("newPlayers") || "[]"
+            );
+            const updatedNewPlayers = newPlayers.filter(
+              (player: any) => player.id !== id
+            );
+            localStorage.setItem(
+              "newPlayers",
+              JSON.stringify(updatedNewPlayers)
+            );
+
+            const isIdInNewPlayers = newPlayers.some(
+              (player: any) => player.id === id
+            );
+            if (!isIdInNewPlayers) {
+              const deletedPlayers = JSON.parse(
+                localStorage.getItem("deletedPlayers") || "[]"
+              );
+              deletedPlayers.push(id);
+              localStorage.setItem(
+                "deletedPlayers",
+                JSON.stringify(deletedPlayers)
+              );
+            }
+            fetchData();
+          } else {
+            alert("Error!Please refresh the page!");
+          }
         });
     });
     setSelectedPlayers([]);

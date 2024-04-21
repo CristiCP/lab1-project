@@ -38,7 +38,10 @@ function UpdateTeam({ setOn, nameTeam, countryTeam, ageTeam }: Props) {
         .then(() =>
           axios
             .get("http://localhost:4000/teams")
-            .then((res) => setTeams(res.data))
+            .then((res) => {
+              setTeams(res.data);
+              localStorage.setItem("teams", JSON.stringify(res.data));
+            })
             .catch((e) => console.log(e))
         )
         .catch((e) => {

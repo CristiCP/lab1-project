@@ -20,25 +20,47 @@ function ListPage() {
   const [selectedPlayers, setSelectedPlayers] = useState<number[]>([]);
   const { players, setPlayers, addPlayer } = usePlayerStore();
 
-  useEffect(() => {
-    const fetchData = () => {
-      axios
-        .get("http://localhost:4000/players")
-        .then((res) => setPlayers(res.data))
-        .catch((e) => {
-          if (e.message == "Network Error") {
-            console.log("Backend is down! Retrying in 7 seconds...");
-            alert("Backend is down!Please wait...");
-            setTimeout(fetchData, 7000);
-          } else {
-            alert("Error on getting players");
-          }
-        });
-      socket.on("newEntity", (newPlayer) => {
-        addPlayer(newPlayer);
-        console.log("New player added!");
+  const fetchData = () => {
+    axios
+      .get("http://localhost:4000/players")
+      .then(() => {
+        return Promise.all([
+          addPlayersFromLocalStorage(),
+          updatePlayersFromLocalStorage(),
+          deletePlayersFromLocalStorage(),
+        ]);
+      })
+      .then(() => {
+        getPlayers();
+      })
+      .catch((e) => {
+        if (e.message == "Network Error") {
+          const localPlayers = JSON.parse(
+            localStorage.getItem("players") || "[]"
+          );
+          setPlayers(localPlayers);
+          setTimeout(fetchData, 7000);
+        } else {
+          alert("Error on getting players");
+        }
       });
-    };
+    socket.on("newEntity", (newPlayer) => {
+      addPlayer(newPlayer);
+      console.log("New player added!");
+    });
+  };
+
+  const getPlayers = () => {
+    axios
+      .get("http://localhost:4000/players")
+      .then((res) => {
+        setPlayers(res.data);
+        localStorage.setItem("players", JSON.stringify(res.data));
+      })
+      .catch((e) => console.log(e));
+  };
+
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -48,14 +70,49 @@ function ListPage() {
       .then(() =>
         axios
           .get("http://localhost:4000/players")
-          .then((res) => setPlayers(res.data))
+          .then((res) => {
+            setPlayers(res.data);
+            localStorage.setItem("players", JSON.stringify(res.data));
+          })
           .catch((e) => console.log(e))
       )
       .catch((e) => {
-        console.log(e);
-        alert(
-          "Error!Player could not be deleted or was already deleted!Please refresh the page!"
-        );
+        if (e.message == "Network Error") {
+          const storedPlayers = JSON.parse(
+            localStorage.getItem("players") || "[]"
+          );
+          const updatedStoredPlayers = storedPlayers.filter(
+            (player: any) => player.id !== id
+          );
+          localStorage.setItem("players", JSON.stringify(updatedStoredPlayers));
+
+          const newPlayers = JSON.parse(
+            localStorage.getItem("newPlayers") || "[]"
+          );
+          const updatedNewPlayers = newPlayers.filter(
+            (player: any) => player.id !== id
+          );
+          localStorage.setItem("newPlayers", JSON.stringify(updatedNewPlayers));
+
+          const isIdInNewPlayers = newPlayers.some(
+            (player: any) => player.id === id
+          );
+          if (!isIdInNewPlayers) {
+            const deletedPlayers = JSON.parse(
+              localStorage.getItem("deletedPlayers") || "[]"
+            );
+            deletedPlayers.push(id);
+            localStorage.setItem(
+              "deletedPlayers",
+              JSON.stringify(deletedPlayers)
+            );
+          }
+          fetchData();
+        } else {
+          alert(
+            "Error!Player could not be deleted or was already deleted!Please refresh the page!"
+          );
+        }
       });
     setOn(false);
   }
@@ -83,6 +140,55 @@ function ListPage() {
       setSelectedPlayers([...selectedPlayers, playerId]);
     } else {
       setSelectedPlayers(selectedPlayers.filter((id) => id !== playerId));
+    }
+  };
+
+  const addPlayersFromLocalStorage = () => {
+    const newPlayers = JSON.parse(localStorage.getItem("newPlayers") || "[]");
+    if (newPlayers.length > 0) {
+      for (const newPlayer of newPlayers) {
+        try {
+          axios.post("http://localhost:4000/players", newPlayer);
+        } catch (error) {
+          console.error("Error adding new player:", error);
+        }
+      }
+      localStorage.removeItem("newPlayers");
+    }
+  };
+
+  const deletePlayersFromLocalStorage = () => {
+    const deletedPlayers = JSON.parse(
+      localStorage.getItem("deletedPlayers") || "[]"
+    );
+    if (deletedPlayers.length > 0) {
+      for (const deletedPlayer of deletedPlayers) {
+        try {
+          axios.delete("http://localhost:4000/players/" + deletedPlayer);
+        } catch (error) {
+          console.error("Error deleting player:", error);
+        }
+      }
+      localStorage.removeItem("deletedPlayers");
+    }
+  };
+
+  const updatePlayersFromLocalStorage = () => {
+    const updatedPlayers = JSON.parse(
+      localStorage.getItem("updatedPlayers") || "[]"
+    );
+    if (updatedPlayers.length > 0) {
+      for (const updatedPlayer of updatedPlayers) {
+        try {
+          axios.put(
+            "http://localhost:4000/players/" + updatedPlayer.id,
+            updatedPlayer
+          );
+        } catch (error) {
+          console.error("Error deleting player:", error);
+        }
+      }
+      localStorage.removeItem("updatedPlayers");
     }
   };
 
@@ -159,6 +265,7 @@ function ListPage() {
               countryPlayer={selectedCountry}
               clubPlayer={selectedClub}
               agePlayer={selectedAge}
+              fetchData={fetchData}
             />
           )}
         </div>
@@ -169,6 +276,7 @@ function ListPage() {
           <DeleteAll
             playersDelete={selectedPlayers}
             setSelectedPlayers={setSelectedPlayers}
+            fetchData={fetchData}
           ></DeleteAll>
         </div>
       </div>

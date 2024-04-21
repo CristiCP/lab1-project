@@ -36,6 +36,31 @@ function AddTeam() {
             console.log(e);
             if (e.response && e.response.status === 409) {
               alert("Team already exist!");
+            } else if (e.message === "Network Error") {
+              const storedTeams = JSON.parse(
+                localStorage.getItem("newTeams") || "[]"
+              );
+              let teamExist = storedTeams.some(
+                (team: any) => team.name == jTeam.name
+              );
+              if (teamExist) {
+                alert("Team already exist!");
+                return;
+              }
+              storedTeams.push(jTeam);
+              localStorage.setItem("newTeams", JSON.stringify(storedTeams));
+              const teams = JSON.parse(localStorage.getItem("teams") || "[]");
+              teams.push(jTeam);
+              localStorage.setItem("teams", JSON.stringify(teams));
+              setConfirmation(true);
+              setTimeout(() => {
+                setConfirmation((prevConfirmation) => {
+                  if (prevConfirmation) {
+                    return false;
+                  }
+                  return prevConfirmation;
+                });
+              }, 2000);
             } else {
               alert("Server error!Please refresh the page!");
             }

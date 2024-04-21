@@ -64,7 +64,18 @@ module.exports = function(db) {
         const id = parseInt(req.params.id);
         const updatedPlayer = req.body;
         console.log("Updating player with ID:", id);
-        db.query('UPDATE players SET name = ?, country = ? , team = ? , age = ? WHERE id = ?', [updatedPlayer.name, updatedPlayer.country, updatedPlayer.team, updatedPlayer.age, id], (error, results) => {
+        db.query('SELECT * FROM teams WHERE name = ?', [updatedPlayer.team], (error, results) => {
+          if (error) {
+              res.status(500).json("Server error");
+              console.log("Server error!!!");
+              return;
+          }
+          if (results.length === 0) {
+              res.status(404).json("Team not found.");
+              console.log("Team not found.");
+              return;
+          }
+          db.query('UPDATE players SET name = ?, country = ? , team = ? , age = ? WHERE id = ?', [updatedPlayer.name, updatedPlayer.country, updatedPlayer.team, updatedPlayer.age, id], (error, results) => {
             if (error) {
                 res.status(500).json("Server error");
                 console.log("Server error!!!");
@@ -78,6 +89,7 @@ module.exports = function(db) {
                 res.status(200);
                 console.log("Player updated successfully.");
             }
+          });
         });
       },
       deletePlayer: function(req, res) {

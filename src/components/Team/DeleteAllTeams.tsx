@@ -6,9 +6,10 @@ const { useTeamStore } = stores;
 interface Props {
   teamsDelete: string[];
   setSelectedTeams: React.Dispatch<React.SetStateAction<string[]>>;
+  fetchData: () => void;
 }
 
-function DeleteAllTeams({ teamsDelete, setSelectedTeams }: Props) {
+function DeleteAllTeams({ teamsDelete, setSelectedTeams, fetchData }: Props) {
   const { setTeams } = useTeamStore();
 
   const handleDeleteAll = () => {
@@ -18,12 +19,47 @@ function DeleteAllTeams({ teamsDelete, setSelectedTeams }: Props) {
         .then(() =>
           axios
             .get("http://localhost:4000/teams")
-            .then((res) => setTeams(res.data))
+            .then((res) => {
+              setTeams(res.data);
+              localStorage.setItem("teams", JSON.stringify(res.data));
+            })
             .catch((e) => console.log(e))
         )
         .catch((e) => {
-          console.log(e);
-          alert("Error!Please refresh the page!");
+          if (e.message == "Network Error") {
+            const storedTeams = JSON.parse(
+              localStorage.getItem("teams") || "[]"
+            );
+            const updatedStoredTeams = storedTeams.filter(
+              (team: any) => team.name !== name
+            );
+            localStorage.setItem("teams", JSON.stringify(updatedStoredTeams));
+
+            const newTeams = JSON.parse(
+              localStorage.getItem("newTeams") || "[]"
+            );
+            const updatedNewTeams = newTeams.filter(
+              (team: any) => team.name !== name
+            );
+            localStorage.setItem("newTeams", JSON.stringify(updatedNewTeams));
+
+            const isNameInNewTeams = newTeams.some(
+              (team: any) => team.name === name
+            );
+            if (!isNameInNewTeams) {
+              const deletedTeams = JSON.parse(
+                localStorage.getItem("deletedTeams") || "[]"
+              );
+              deletedTeams.push(name);
+              localStorage.setItem(
+                "deletedTeams",
+                JSON.stringify(deletedTeams)
+              );
+            }
+            fetchData();
+          } else {
+            alert("Error!Please refresh the page!");
+          }
         });
     });
     setSelectedTeams([]);
