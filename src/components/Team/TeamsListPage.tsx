@@ -12,10 +12,29 @@ function TeamsListPage() {
   const [selectedAge, setSelectedAge] = useState(-1);
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const windowHeight = window.innerHeight;
+      const fullHeight = document.documentElement.offsetHeight;
+      const scrollPosition = document.documentElement.scrollTop;
+
+      if (windowHeight + scrollPosition >= fullHeight) {
+        setPage((prevPage) => prevPage + 1);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const fetchData = () => {
     axios
-      .get("http://localhost:4000/teams")
+      .get(`http://localhost:4000/teams?page=${page}&pageSize=50`)
       .then(() => {
         return Promise.all([
           addTeamsFromLocalStorage(),
@@ -38,10 +57,10 @@ function TeamsListPage() {
 
   const getTeams = () => {
     axios
-      .get("http://localhost:4000/teams")
+      .get(`http://localhost:4000/teams?page=${page}&pageSize=50`)
       .then((res) => {
-        setTeams(res.data);
-        localStorage.setItem("teams", JSON.stringify(res.data));
+        setTeams([...teams, ...res.data]);
+        localStorage.setItem("teams", JSON.stringify([...teams, ...res.data]));
       })
       .catch((e) => console.log(e));
   };
@@ -50,12 +69,16 @@ function TeamsListPage() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    fetchData();
+  }, [page]);
+
   function handleDeleteButton(name: string) {
     axios
       .delete("http://localhost:4000/teams/" + name)
       .then(() =>
         axios
-          .get("http://localhost:4000/teams")
+          .get(`http://localhost:4000/teams?page=${page}&pageSize=50`)
           .then((res) => {
             setTeams(res.data);
             localStorage.setItem("teams", JSON.stringify(res.data));
@@ -197,21 +220,21 @@ function TeamsListPage() {
                   />
                 </div>
               </div>
+              <div className="update-entity">
+                {isOn && selectedName == team.name && (
+                  <UpdateTeam
+                    setOn={setOn}
+                    nameTeam={selectedName}
+                    countryTeam={selectedCountry}
+                    ageTeam={selectedAge}
+                  />
+                )}
+              </div>
             </li>
           ))}
         </ul>
       </div>
       <div className="buttons-container">
-        <div className="update-entity">
-          {isOn && (
-            <UpdateTeam
-              setOn={setOn}
-              nameTeam={selectedName}
-              countryTeam={selectedCountry}
-              ageTeam={selectedAge}
-            />
-          )}
-        </div>
         {
           <div className="delete-all-entity">
             <DeleteAllTeams

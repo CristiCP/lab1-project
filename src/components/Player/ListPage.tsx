@@ -19,10 +19,29 @@ function ListPage() {
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedPlayers, setSelectedPlayers] = useState<number[]>([]);
   const { players, setPlayers, addPlayer } = usePlayerStore();
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const windowHeight = window.innerHeight;
+      const fullHeight = document.documentElement.offsetHeight;
+      const scrollPosition = document.documentElement.scrollTop;
+
+      if (windowHeight + scrollPosition >= fullHeight) {
+        setPage((prevPage) => prevPage + 1);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const fetchData = () => {
     axios
-      .get("http://localhost:4000/players")
+      .get(`http://localhost:4000/players?page=${page}&pageSize=50`)
       .then(() => {
         return Promise.all([
           addPlayersFromLocalStorage(),
@@ -52,10 +71,13 @@ function ListPage() {
 
   const getPlayers = () => {
     axios
-      .get("http://localhost:4000/players")
+      .get(`http://localhost:4000/players?page=${page}&pageSize=50`)
       .then((res) => {
-        setPlayers(res.data);
-        localStorage.setItem("players", JSON.stringify(res.data));
+        setPlayers([...players, ...res.data]);
+        localStorage.setItem(
+          "players",
+          JSON.stringify([...players, ...res.data])
+        );
       })
       .catch((e) => console.log(e));
   };
@@ -64,18 +86,17 @@ function ListPage() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    fetchData();
+  }, [page]);
+
   function handleDeleteButton(id: number) {
     axios
       .delete("http://localhost:4000/players/" + id)
-      .then(() =>
-        axios
-          .get("http://localhost:4000/players")
-          .then((res) => {
-            setPlayers(res.data);
-            localStorage.setItem("players", JSON.stringify(res.data));
-          })
-          .catch((e) => console.log(e))
-      )
+      .then(() => {
+        setPlayers(players.filter((player: any) => player.id !== id));
+        localStorage.setItem("players", JSON.stringify(players));
+      })
       .catch((e) => {
         if (e.message == "Network Error") {
           const storedPlayers = JSON.parse(
@@ -251,24 +272,24 @@ function ListPage() {
                   />
                 </div>
               </div>
+              <div className="update-entity">
+                {isOn && selectedIndex == player.id && (
+                  <UpdatePlayer
+                    setOn={setOn}
+                    idPlayer={selectedIndex}
+                    namePlayer={selectedName}
+                    countryPlayer={selectedCountry}
+                    clubPlayer={selectedClub}
+                    agePlayer={selectedAge}
+                    fetchData={fetchData}
+                  />
+                )}
+              </div>
             </li>
           ))}
         </ul>
       </div>
       <div className="buttons-container">
-        <div className="update-entity">
-          {isOn && (
-            <UpdatePlayer
-              setOn={setOn}
-              idPlayer={selectedIndex}
-              namePlayer={selectedName}
-              countryPlayer={selectedCountry}
-              clubPlayer={selectedClub}
-              agePlayer={selectedAge}
-              fetchData={fetchData}
-            />
-          )}
-        </div>
         <div className="export-entity">
           <Export></Export>
         </div>

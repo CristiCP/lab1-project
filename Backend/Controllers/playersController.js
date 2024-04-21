@@ -2,18 +2,21 @@ module.exports = function(db) {
     return {
       getAllPlayers: function(req, res) {
         console.log("Getting all players...");
-        let { sortBy, order } = req.query;
+        let { sortBy, order, page, pageSize } = req.query;
         sortBy = sortBy || 'name';
         order = order && order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
-        const sql = `SELECT * FROM players ORDER BY ${sortBy} ${order}`;
-        db.query(sql, (error, results) => {
+        page = parseInt(page) || 1; 
+        pageSize = parseInt(pageSize) || 50; 
+        const offset = (page - 1) * pageSize;
+        const sql = `SELECT * FROM players ORDER BY ${sortBy} ${order} LIMIT ?, ?`;
+        db.query(sql, [offset, pageSize], (error, results) => {
             if (error) {
                 res.status(500).json("Server error");
                 console.log("Server error!!!");
                 return;
             }
             res.json(results);
-            console.log("All players sent successfully.");
+            console.log("Players sent successfully.");
         });
     },
       getPlayerById: function(req, res) {

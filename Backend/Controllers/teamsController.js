@@ -2,18 +2,21 @@ module.exports = function(db) {
     return {
         getAllTeams: function(req, res) {
             console.log("Getting all teams...");
-            let { sortBy, order } = req.query; 
+            let { sortBy, order, page, pageSize } = req.query; 
             sortBy = sortBy || 'name';
             order = order && order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
-            const sql = `SELECT * FROM teams ORDER BY ${sortBy} ${order}`;
-            db.query(sql, (error, results) => {
+            page = parseInt(page) || 1; 
+            pageSize = parseInt(pageSize) || 50; 
+            const offset = (page - 1) * pageSize;
+            const sql = `SELECT * FROM teams ORDER BY ${sortBy} ${order} LIMIT ?, ?`;
+            db.query(sql, [offset, pageSize], (error, results) => {
                 if (error) {
                     res.status(500).json("Server error");
                     console.log("Server error!!!");
                     return;
                 }
                 res.json(results);
-                console.log("All teams sent successfully.");
+                console.log("Teams sent successfully.");
             });
         },
         getTeamByName: function(req,res) {
@@ -98,6 +101,49 @@ module.exports = function(db) {
                     console.log("Team and all players from the team deleted successfully.");
                 }
             });
-          }
+          },
+          getAllTeamsWithPlayers: function(req, res) {
+            console.log("Getting all teams with players...");
+            let { sortBy, order, page, pageSize } = req.query; 
+            sortBy = sortBy || 'team_name';
+            order = order && order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+            page = parseInt(page) || 1; 
+            pageSize = parseInt(pageSize) || 50; 
+            const offset = (page - 1) * pageSize;
+            const sql = `SELECT teams.name AS team_name, teams.country AS team_country, teams.year AS team_year,
+                         players.name AS player_name, players.country AS player_country, players.age AS player_age
+                         FROM teams
+                         LEFT JOIN players ON teams.name = players.team
+                         ORDER BY ${sortBy} ${order}
+                         LIMIT ?, ?`;
+            db.query(sql, [offset, pageSize], (error, results) => {
+                if (error) {
+                    res.status(500).json("Server error");
+                    console.log("Server error!!!");
+                    return;
+                }
+                const teamsWithPlayers = results.reduce((acc, row) => {
+                    const teamName = row.team_name;
+                    if (!acc[teamName]) {
+                        acc[teamName] = {
+                            name: row.team_name,
+                            country: row.team_country,
+                            year: row.team_year,
+                            players: []
+                        };
+                    }
+                    if (row.player_name) {
+                        acc[teamName].players.push({
+                            name: row.player_name,
+                            country: row.player_country,
+                            age: row.player_age
+                        });
+                    }
+                    return acc;
+                }, {});
+                res.json(Object.values(teamsWithPlayers)); 
+                console.log("Teams with players sent successfully.");
+            });
+        }
     };
 };

@@ -17,5 +17,7 @@ module.exports = (db) => {
     router.put('/teams/:name', teamsController.updateTeam);
     router.delete('/teams/:name', teamsController.deleteTeam);
 
+    router.get('/all',teamsController.getAllTeamsWithPlayers);
+
     return router;
 };

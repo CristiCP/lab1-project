@@ -7,6 +7,8 @@ const mysql = require("mysql");
 const app = express();
 const http = require("http")
 const {Server} = require('socket.io')
+const axios = require('axios');
+const faker = require('faker');
 
 const db = mysql.createConnection({
   host:'localhost',
@@ -23,12 +25,6 @@ const corsOptions = {
 }
 app.use(cors(corsOptions));
 app.use(helmet());
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 100 
-});
-app.use(limiter);
 
 const routes = require('./routes')(db);
 app.use(routes);
