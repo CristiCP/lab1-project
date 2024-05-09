@@ -1,5 +1,6 @@
 import React from "react";
 import stores from "../../storage/StorageZustand";
+const { useTokenStore } = stores;
 import axios from "axios";
 const { useTeamStore } = stores;
 
@@ -10,15 +11,21 @@ interface Props {
 }
 
 function DeleteAllTeams({ teamsDelete, setSelectedTeams, fetchData }: Props) {
+  const { token } = useTokenStore();
+  const axiosConfig = {
+    headers: {
+      Authorization: token,
+    },
+  };
   const { setTeams } = useTeamStore();
 
   const handleDeleteAll = () => {
     teamsDelete.forEach((name) => {
       axios
-        .delete(`http://localhost:4000/teams/${name}`)
+        .delete(`http://localhost:4000/teams/${name}`, axiosConfig)
         .then(() =>
           axios
-            .get("http://localhost:4000/teams")
+            .get("http://localhost:4000/teams", axiosConfig)
             .then((res) => {
               setTeams(res.data);
               localStorage.setItem("teams", JSON.stringify(res.data));

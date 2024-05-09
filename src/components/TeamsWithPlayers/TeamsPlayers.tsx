@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import CountryImage from "../CountryImage";
+import stores from "../../storage/StorageZustand";
+const { useTokenStore } = stores;
 
 interface Team {
   name: string;
@@ -16,6 +18,12 @@ interface Player {
 }
 
 function TeamsPlayers() {
+  const { token } = useTokenStore();
+  const axiosConfig = {
+    headers: {
+      Authorization: token,
+    },
+  };
   const [teamsWithPlayers, setTeamsWithPlayers] = useState<Team[]>([]);
   const [page, setPage] = useState(1);
 
@@ -37,7 +45,10 @@ function TeamsPlayers() {
 
   useEffect(() => {
     axios
-      .get<Team[]>(`http://localhost:4000/all?page=${page}&pageSize=50`)
+      .get<Team[]>(
+        `http://localhost:4000/all?page=${page}&pageSize=50`,
+        axiosConfig
+      )
       .then((response) => {
         setTeamsWithPlayers([...teamsWithPlayers, ...response.data]);
       })

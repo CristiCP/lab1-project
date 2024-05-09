@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import stores from "../../storage/StorageZustand";
-const { usePlayerStore } = stores;
+const { usePlayerStore, useTokenStore } = stores;
 
 interface Props {
   setOn: React.Dispatch<React.SetStateAction<boolean>>;
@@ -28,6 +28,12 @@ function UpdatePlayer({
   agePlayer,
   fetchData,
 }: Props) {
+  const { token } = useTokenStore();
+  const axiosConfig = {
+    headers: {
+      Authorization: token,
+    },
+  };
   const [club, setClub] = useState(clubPlayer);
   const [selectedIdPlayer, setSelectedIdPlayer] = useState(idPlayer);
   const [selectedName, setSelectedName] = useState(namePlayer);
@@ -57,10 +63,10 @@ function UpdatePlayer({
         id: selectedIdPlayer,
       };
       axios
-        .put("http://localhost:4000/players/" + idPlayer, values)
+        .put("http://localhost:4000/players/" + idPlayer, values, axiosConfig)
         .then(() =>
           axios
-            .get("http://localhost:4000/players")
+            .get("http://localhost:4000/players", axiosConfig)
             .then((res) => {
               setPlayers(res.data);
               localStorage.setItem("players", JSON.stringify(res.data));

@@ -1,18 +1,31 @@
+import AuthentificationPage from "./components/AuthentificationPage";
 import Home from "./components/Home";
 import ListPage from "./components/Player/ListPage";
 import TeamsListPage from "./components/Team/TeamsListPage";
 import TeamsPlayers from "./components/TeamsWithPlayers/TeamsPlayers";
 import "./inxdex.css";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import stores from "./storage/StorageZustand";
+import Logout from "./components/Logout";
+const { useTokenStore } = stores;
 
 function App() {
+  const { token } = useTokenStore();
+
   return (
     <BrowserRouter>
+      <div>
+        {token && <Logout />} {}
+      </div>
       <Routes>
-        <Route path="/" element={<Home></Home>}></Route>
-        <Route path="/players" element={<ListPage></ListPage>}></Route>
-        <Route path="/teams" element={<TeamsListPage></TeamsListPage>}></Route>
-        <Route path="/all" element={<TeamsPlayers></TeamsPlayers>}></Route>
+        <Route path="/authentification" element={<AuthentificationPage />} />
+        {token && <Route path="/" element={<Home />} />}
+        {token && <Route path="/players" element={<ListPage />} />}
+        {token && <Route path="/teams" element={<TeamsListPage />} />}
+        {token && <Route path="/all" element={<TeamsPlayers />} />}
+        {!token && (
+          <Route path="*" element={<Navigate to="/authentification" />} />
+        )}
       </Routes>
     </BrowserRouter>
   );

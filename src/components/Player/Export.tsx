@@ -1,5 +1,7 @@
 import { saveAs } from "file-saver";
 import axios from "axios";
+import stores from "../../storage/StorageZustand";
+const { useTokenStore } = stores;
 
 interface UserData {
   name: string;
@@ -9,9 +11,16 @@ interface UserData {
 }
 
 function Export() {
+  const { token } = useTokenStore();
+  const axiosConfig = {
+    headers: {
+      Authorization: token,
+    },
+  };
+
   let exportAction = () => {
     axios
-      .get("http://localhost:4000/players")
+      .get("http://localhost:4000/players", axiosConfig)
       .then((res) => {
         const csvData = res.data
           .map(

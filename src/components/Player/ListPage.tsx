@@ -5,12 +5,18 @@ import CountryImage from "../CountryImage";
 import Export from "./Export";
 import DeleteAll from "./DeleteAll";
 import stores from "../../storage/StorageZustand";
-const { usePlayerStore } = stores;
+const { usePlayerStore, useTokenStore } = stores;
 import io from "socket.io-client";
 
 const socket = io("http://localhost:4000");
 
 function ListPage() {
+  const { token } = useTokenStore();
+  const axiosConfig = {
+    headers: {
+      Authorization: token,
+    },
+  };
   const [isOn, setOn] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [selectedClub, setSelectedClub] = useState("");
@@ -41,7 +47,10 @@ function ListPage() {
 
   const fetchData = () => {
     axios
-      .get(`http://localhost:4000/players?page=${page}&pageSize=50`)
+      .get(
+        `http://localhost:4000/players?page=${page}&pageSize=50`,
+        axiosConfig
+      )
       .then(() => {
         return Promise.all([
           addPlayersFromLocalStorage(),
@@ -71,12 +80,21 @@ function ListPage() {
 
   const getPlayers = () => {
     axios
-      .get(`http://localhost:4000/players?page=${page}&pageSize=50`)
+      .get(
+        `http://localhost:4000/players?page=${page}&pageSize=50`,
+        axiosConfig
+      )
       .then((res) => {
-        setPlayers([...players, ...res.data]);
+        const newPlayers = res.data.filter((newPlayer: any) => {
+          return !players.some(
+            (existingPlayer) => existingPlayer.id === newPlayer.id
+          );
+        });
+
+        setPlayers([...players, ...newPlayers]);
         localStorage.setItem(
           "players",
-          JSON.stringify([...players, ...res.data])
+          JSON.stringify([...players, ...newPlayers])
         );
       })
       .catch((e) => console.log(e));
@@ -92,7 +110,7 @@ function ListPage() {
 
   function handleDeleteButton(id: number) {
     axios
-      .delete("http://localhost:4000/players/" + id)
+      .delete("http://localhost:4000/players/" + id, axiosConfig)
       .then(() => {
         setPlayers(players.filter((player: any) => player.id !== id));
         localStorage.setItem("players", JSON.stringify(players));
@@ -169,7 +187,7 @@ function ListPage() {
     if (newPlayers.length > 0) {
       for (const newPlayer of newPlayers) {
         try {
-          axios.post("http://localhost:4000/players", newPlayer);
+          axios.post("http://localhost:4000/players", newPlayer, axiosConfig);
         } catch (error) {
           console.error("Error adding new player:", error);
         }
@@ -185,7 +203,10 @@ function ListPage() {
     if (deletedPlayers.length > 0) {
       for (const deletedPlayer of deletedPlayers) {
         try {
-          axios.delete("http://localhost:4000/players/" + deletedPlayer);
+          axios.delete(
+            "http://localhost:4000/players/" + deletedPlayer,
+            axiosConfig
+          );
         } catch (error) {
           console.error("Error deleting player:", error);
         }
@@ -203,7 +224,8 @@ function ListPage() {
         try {
           axios.put(
             "http://localhost:4000/players/" + updatedPlayer.id,
-            updatedPlayer
+            updatedPlayer,
+            axiosConfig
           );
         } catch (error) {
           console.error("Error deleting player:", error);

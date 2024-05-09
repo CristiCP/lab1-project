@@ -2,6 +2,7 @@ import axios from "axios";
 import React from "react";
 import stores from "../../storage/StorageZustand";
 const { usePlayerStore } = stores;
+const { useTokenStore } = stores;
 
 interface Props {
   playersDelete: number[];
@@ -10,15 +11,21 @@ interface Props {
 }
 
 function DeleteAll({ playersDelete, setSelectedPlayers, fetchData }: Props) {
+  const { token } = useTokenStore();
+  const axiosConfig = {
+    headers: {
+      Authorization: token,
+    },
+  };
   const { setPlayers } = usePlayerStore();
 
   const handleDeleteAll = () => {
     playersDelete.forEach((id) => {
       axios
-        .delete(`http://localhost:4000/players/${id}`)
+        .delete(`http://localhost:4000/players/${id}`, axiosConfig)
         .then(() =>
           axios
-            .get("http://localhost:4000/players")
+            .get("http://localhost:4000/players", axiosConfig)
             .then((res) => {
               setPlayers(res.data);
               localStorage.setItem("players", JSON.stringify(res.data));

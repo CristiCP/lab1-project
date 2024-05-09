@@ -28,6 +28,11 @@ interface TeamStore {
   removeTeam: (name: string) => void;
 }
 
+interface TokenStore {
+  token: string | null;
+  setToken: (token: string | null) => void;
+}
+
 const usePlayerStore = create<PlayerStore>((set) => ({
   players: [],
   setPlayers: (players) =>
@@ -60,9 +65,15 @@ const useTeamStore = create<TeamStore>((set) => ({
     })),
 }));
 
+const useTokenStore = create<TokenStore>((set) => ({
+  token: localStorage.getItem("token") || null,
+  setToken: (token) => set({ token }),
+}));
+
 const stores = {
   usePlayerStore,
   useTeamStore,
+  useTokenStore,
 };
 
 export default stores;

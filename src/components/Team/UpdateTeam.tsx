@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import stores from "../../storage/StorageZustand";
+const { useTokenStore } = stores;
 import axios from "axios";
 const { useTeamStore } = stores;
 
@@ -11,6 +12,12 @@ interface Props {
 }
 
 function UpdateTeam({ setOn, nameTeam, countryTeam, ageTeam }: Props) {
+  const { token } = useTokenStore();
+  const axiosConfig = {
+    headers: {
+      Authorization: token,
+    },
+  };
   const [selectedName, setSelectedName] = useState(nameTeam);
   const [selectedAge, setSelectedAge] = useState(ageTeam);
   const [selectedCountry, setSelectedCountry] = useState(countryTeam);
@@ -34,10 +41,10 @@ function UpdateTeam({ setOn, nameTeam, countryTeam, ageTeam }: Props) {
         year: selectedAge,
       };
       axios
-        .put("http://localhost:4000/teams/" + selectedName, values)
+        .put("http://localhost:4000/teams/" + selectedName, values, axiosConfig)
         .then(() =>
           axios
-            .get("http://localhost:4000/teams")
+            .get("http://localhost:4000/teams", axiosConfig)
             .then((res) => {
               setTeams(res.data);
               localStorage.setItem("teams", JSON.stringify(res.data));

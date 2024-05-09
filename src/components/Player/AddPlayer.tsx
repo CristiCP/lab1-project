@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import stores from "../../storage/StorageZustand";
+const { useTokenStore } = stores;
 
 interface Team {
   name: string;
@@ -9,6 +11,12 @@ interface Team {
 }
 
 function AddPlayer() {
+  const { token } = useTokenStore();
+  const axiosConfig = {
+    headers: {
+      Authorization: token,
+    },
+  };
   const [name, setName] = useState("");
   const [nationality, setNationality] = useState("");
   const [team, setTeam] = useState("");
@@ -30,7 +38,7 @@ function AddPlayer() {
           age: age,
         };
         axios
-          .post("http://localhost:4000/players", jPlayer)
+          .post("http://localhost:4000/players", jPlayer, axiosConfig)
           .then(() => {
             setConfirmation(true);
             setTimeout(() => {

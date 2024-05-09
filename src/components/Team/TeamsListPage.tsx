@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
 import stores from "../../storage/StorageZustand";
+const { useTokenStore } = stores;
 const { useTeamStore } = stores;
 import CountryImage from "../CountryImage";
 import axios from "axios";
 import UpdateTeam from "./UpdateTeam";
 import DeleteAllTeams from "./DeleteAllTeams";
 function TeamsListPage() {
+  const { token } = useTokenStore();
+  const axiosConfig = {
+    headers: {
+      Authorization: token,
+    },
+  };
   const { teams, setTeams } = useTeamStore();
   const [isOn, setOn] = useState(false);
   const [selectedName, setSelectedName] = useState("");
@@ -34,7 +41,7 @@ function TeamsListPage() {
 
   const fetchData = () => {
     axios
-      .get(`http://localhost:4000/teams?page=${page}&pageSize=50`)
+      .get(`http://localhost:4000/teams?page=${page}&pageSize=50`, axiosConfig)
       .then(() => {
         return Promise.all([
           addTeamsFromLocalStorage(),
@@ -57,10 +64,16 @@ function TeamsListPage() {
 
   const getTeams = () => {
     axios
-      .get(`http://localhost:4000/teams?page=${page}&pageSize=50`)
+      .get(`http://localhost:4000/teams?page=${page}&pageSize=50`, axiosConfig)
       .then((res) => {
-        setTeams([...teams, ...res.data]);
-        localStorage.setItem("teams", JSON.stringify([...teams, ...res.data]));
+        const newTeams = res.data.filter((newTeam: any) => {
+          return !teams.some(
+            (existingTeam: any) => existingTeam.name === newTeam.name
+          );
+        });
+
+        setTeams([...teams, ...newTeams]);
+        localStorage.setItem("teams", JSON.stringify([...teams, ...newTeams]));
       })
       .catch((e) => console.log(e));
   };
@@ -75,10 +88,13 @@ function TeamsListPage() {
 
   function handleDeleteButton(name: string) {
     axios
-      .delete("http://localhost:4000/teams/" + name)
+      .delete("http://localhost:4000/teams/" + name, axiosConfig)
       .then(() =>
         axios
-          .get(`http://localhost:4000/teams?page=${page}&pageSize=50`)
+          .get(
+            `http://localhost:4000/teams?page=${page}&pageSize=50`,
+            axiosConfig
+          )
           .then((res) => {
             setTeams(res.data);
             localStorage.setItem("teams", JSON.stringify(res.data));
@@ -142,7 +158,7 @@ function TeamsListPage() {
     if (newTeams.length > 0) {
       for (const newTeam of newTeams) {
         try {
-          axios.post("http://localhost:4000/teams", newTeam);
+          axios.post("http://localhost:4000/teams", newTeam, axiosConfig);
         } catch (error) {
           console.error("Error adding new team:", error);
         }
@@ -158,7 +174,10 @@ function TeamsListPage() {
     if (deletedTeams.length > 0) {
       for (const deletedTeam of deletedTeams) {
         try {
-          axios.delete("http://localhost:4000/teams/" + deletedTeam);
+          axios.delete(
+            "http://localhost:4000/teams/" + deletedTeam,
+            axiosConfig
+          );
         } catch (error) {
           console.error("Error deleting team:", error);
         }

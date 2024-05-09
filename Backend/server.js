@@ -13,7 +13,7 @@ const faker = require('faker');
 const db = mysql.createConnection({
   host:'localhost',
   user:'root',
-  password:'Masina!12',
+  password:'',
   database:'football'
 })
 
