@@ -50,7 +50,7 @@ function TeamsPlayers() {
         axiosConfig
       )
       .then((response) => {
-        setTeamsWithPlayers([...teamsWithPlayers, ...response.data]);
+        setTeamsWithPlayers(response.data);
       })
       .catch((error) => {
         console.error("Error fetching teams and players:", error);
@@ -60,29 +60,20 @@ function TeamsPlayers() {
   return (
     <div>
       <h2>Teams and Players</h2>
-      {teamsWithPlayers.map((team) => (
-        <li className="player-item">
-          <div key={team.name}>
+      {teamsWithPlayers.map((team, index) => (
+        <li className="player-item" key={index}>
+          <div>
             <div className="player-info">
-              <strong>
-                Name:
-                {" " + team.name + " "}
-              </strong>
-              <strong>
-                Country:
-                {" " + team.country + " "}
-              </strong>
-              <strong>
-                Year:
-                {" " + team.year + " "}
-              </strong>
+              <strong>Name: {team.name}</strong>
+              <strong>Country: {team.country}</strong>
+              <strong>Year: {team.year}</strong>
             </div>
             <div className="country-image">
               <CountryImage country={team.country} />
             </div>
             <ul>
-              {team.players.map((player) => (
-                <li key={player.name}>
+              {team.players.map((player, playerIndex) => (
+                <li key={`${team.name}-${player.name}-${playerIndex}`}>
                   {player.name} - {player.country} - Age: {player.age}
                 </li>
               ))}

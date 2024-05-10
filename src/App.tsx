@@ -7,6 +7,7 @@ import "./inxdex.css";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import stores from "./storage/StorageZustand";
 import Logout from "./components/Logout";
+import ValidationPage from "./components/ValidationPage";
 const { useTokenStore } = stores;
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         {token && <Logout />} {}
       </div>
       <Routes>
+        <Route path="/validation" element={<ValidationPage></ValidationPage>} />
         <Route path="/authentification" element={<AuthentificationPage />} />
         {token && <Route path="/" element={<Home />} />}
         {token && <Route path="/players" element={<ListPage />} />}

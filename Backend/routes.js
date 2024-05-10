@@ -46,6 +46,7 @@ module.exports = (db) => {
 
     router.post('/authentification', authenticationControlller.LoginUser);
     router.post('/signup', authenticationControlller.SignUpUser);
+    router.post('/validate',authenticationControlller.ValidateUser);
 
     router.use(verifyToken(db));
     router.get('/players', playerController.getAllPlayers);

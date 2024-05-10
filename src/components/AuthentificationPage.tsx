@@ -30,8 +30,19 @@ function AuthentificationPage() {
       setToken(res.data);
       navigate("/");
       window.location.reload();
-    } catch (error) {
-      alert("Invalid username or password!");
+    } catch (error: any) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          alert("Invalid username or password!");
+        } else if (error.response.status === 403) {
+          alert(
+            "Account needs to be verified first!Validation link was sent on your email!"
+          );
+        } else {
+          console.error("Error:", error.response.status);
+          alert("An error occurred. Please try again later.");
+        }
+      }
     }
   };
 
