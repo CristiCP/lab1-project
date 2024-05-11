@@ -37,7 +37,9 @@ function TeamsPlayers() {
         setPage((prevPage) => prevPage + 1);
       }
     };
+
     window.addEventListener("scroll", handleScroll);
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };

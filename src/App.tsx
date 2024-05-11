@@ -6,7 +6,6 @@ import TeamsPlayers from "./components/TeamsWithPlayers/TeamsPlayers";
 import "./inxdex.css";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import stores from "./storage/StorageZustand";
-import Logout from "./components/Logout";
 import ValidationPage from "./components/ValidationPage";
 const { useTokenStore } = stores;
 
@@ -15,9 +14,6 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div>
-        {token && <Logout />} {}
-      </div>
       <Routes>
         <Route path="/validation" element={<ValidationPage></ValidationPage>} />
         <Route path="/authentification" element={<AuthentificationPage />} />

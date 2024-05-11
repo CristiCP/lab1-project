@@ -1,6 +1,9 @@
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const randomstring = require('randomstring');
 module.exports = function(db) {
+
+    const validationCodes = {};
 
     const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
@@ -31,6 +34,23 @@ module.exports = function(db) {
         });
     };
 
+    const send2StepsEmail = (email,code) => {
+        const mailOptions = {
+            from: 'cristipopan1262@gmail.com',
+            to: email,
+            subject: 'Account Verify',
+            html: `Please use the following code to verify your account: <b>${code}</b>`
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Error sending email:', error);
+            } else {
+                console.log('Email sent:', info.response);
+            }
+        });
+    }
+
     return {
         LoginUser: function(req, res) {
             console.log("Login...");
@@ -43,23 +63,10 @@ module.exports = function(db) {
                     if (results.length > 0) {
                         const user = results[0];
                         if (user.isValid) {
-                            console.log("Login successful");
-                            const token = jwt.sign({ username }, '5nB0$CZ4*!8x@1WQzPmY&rS#6QD!oF$D', { expiresIn: '5h' });
-                            db.query('DELETE FROM tokens WHERE username = ?', [username], (deleteError, deleteResults) => {
-                                if (deleteError) {
-                                    console.error("Error deleting tokens:", deleteError);
-                                    res.status(500).send("Internal Server Error");
-                                } else {
-                                    db.query('INSERT INTO tokens (username, token) VALUES (?, ?)', [username, token], (insertError, insertResults) => {
-                                        if (insertError) {
-                                            console.error("Error storing token:", insertError);
-                                            res.status(500).send("Internal Server Error");
-                                        } else {
-                                            res.status(200).json(token);
-                                        }
-                                    });
-                                }
-                            });
+                            const code = randomstring.generate({ length: 6, charset: 'numeric' });
+                            validationCodes[username] = code;
+                            send2StepsEmail(user.email, code);
+                            res.status(200).json({ message: "Validation code sent successfully" });
                         } else {
                             console.log("Account not verified");
                             res.status(403).send("Account needs to be verified first");
@@ -128,6 +135,38 @@ module.exports = function(db) {
                     return res.status(200).send('User validated successfully');
                 });
             });
+        },VerifyUser: function(req,res) {
+            const { username, code } = req.body;
+            console.log("Verify user...")
+            if (!username || !code) {
+                console.log('Username and code are required')
+                return res.status(400).send('Username and code are required');
+            }
+            const storedCode = validationCodes[username];
+            if (!storedCode) {
+                console.log('Validation code not found')
+                return res.status(404).send('Validation code not found');
+            }
+            if (code !== storedCode) {
+                console.log('Invalid validation code');
+                return res.status(401).send('Invalid validation code');
+            }
+            const token = jwt.sign({ username }, '5nB0$CZ4*!8x@1WQzPmY&rS#6QD!oF$D', { expiresIn: '5h' });
+                            db.query('DELETE FROM tokens WHERE username = ?', [username], (deleteError, deleteResults) => {
+                                if (deleteError) {
+                                    console.error("Error deleting tokens:", deleteError);
+                                    res.status(500).send("Internal Server Error");
+                                } else {
+                                    db.query('INSERT INTO tokens (username, token) VALUES (?, ?)', [username, token], (insertError, insertResults) => {
+                                        if (insertError) {
+                                            console.error("Error storing token:", insertError);
+                                            res.status(500).send("Internal Server Error");
+                                        } else {
+                                            res.status(200).json(token);
+                                        }
+                                    });
+                                }
+                            });
         }
     };
 }

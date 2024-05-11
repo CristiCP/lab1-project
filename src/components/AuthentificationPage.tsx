@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   TextField,
   Button,
@@ -18,6 +18,8 @@ function AuthentificationPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLogin, setIsLogin] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
   const { setToken } = useTokenStore();
 
   const handleLogin = async () => {
@@ -26,10 +28,8 @@ function AuthentificationPage() {
         username: username,
         password: password,
       });
-      localStorage.setItem("token", res.data);
-      setToken(res.data);
-      navigate("/");
-      window.location.reload();
+      console.log(res.data);
+      setIsLoggedIn(true);
     } catch (error: any) {
       if (error.response) {
         if (error.response.status === 401) {
@@ -42,6 +42,37 @@ function AuthentificationPage() {
           console.error("Error:", error.response.status);
           alert("An error occurred. Please try again later.");
         }
+      }
+    }
+  };
+
+  const handleSecondStep = async () => {
+    try {
+      const res = await axios.post("http://localhost:4000/verify", {
+        username: username,
+        code: verificationCode,
+      });
+      localStorage.setItem("token", res.data);
+      setToken(res.data);
+      navigate("/");
+    } catch (error) {
+      alert("Invalid verification code. Please try again.");
+    }
+  };
+
+  const handleSubmit = (event: any) => {
+    event.preventDefault();
+    if (isLogin) {
+      if (password === "" || username === "") {
+        alert("Complete all the details!");
+      } else {
+        handleLogin();
+      }
+    } else {
+      if (email === "" || password === "" || username === "") {
+        alert("Complete all the details!");
+      } else {
+        handleSignUp();
       }
     }
   };
@@ -60,23 +91,6 @@ function AuthentificationPage() {
     }
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (isLogin) {
-      if (password === "" || username === "") {
-        alert("Complete all the details!");
-      } else {
-        handleLogin();
-      }
-    } else {
-      if (email === "" || password === "" || username === "") {
-        alert("Complete all the details!");
-      } else {
-        handleSignUp();
-      }
-    }
-  };
-
   return (
     <Container maxWidth="xs">
       <Paper
@@ -87,44 +101,80 @@ function AuthentificationPage() {
           {isLogin ? "Log In" : "Sign Up"}
         </Typography>
         <form onSubmit={handleSubmit}>
-          {!isLogin && (
-            <Grid item xs={12} style={{ marginBottom: "16px" }}>
-              <TextField
-                fullWidth
-                label="Email"
-                variant="outlined"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </Grid>
+          {!isLoggedIn && (
+            <>
+              {!isLogin && (
+                <Grid item xs={12} style={{ marginBottom: "16px" }}>
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    variant="outlined"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </Grid>
+              )}
+              <Grid item xs={12} style={{ marginBottom: "16px" }}>
+                <TextField
+                  fullWidth
+                  label="Username"
+                  variant="outlined"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} style={{ marginBottom: "16px" }}>
+                <TextField
+                  fullWidth
+                  type="password"
+                  label="Password"
+                  variant="outlined"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                >
+                  {isLogin ? "Log In" : "Sign Up"}
+                </Button>
+              </Grid>
+            </>
           )}
-          <Grid item xs={12} style={{ marginBottom: "16px" }}>
-            <TextField
-              fullWidth
-              label="Username"
-              variant="outlined"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} style={{ marginBottom: "16px" }}>
-            <TextField
-              fullWidth
-              type="password"
-              label="Password"
-              variant="outlined"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Button type="submit" fullWidth variant="contained" color="primary">
-              {isLogin ? "Log In" : "Sign Up"}
-            </Button>
-          </Grid>
+          {isLoggedIn && (
+            <>
+              <Typography variant="h6" align="center" gutterBottom>
+                Second Step Authentication
+              </Typography>
+              <Grid item xs={12} style={{ marginBottom: "16px" }}>
+                <TextField
+                  fullWidth
+                  label="Verification Code"
+                  variant="outlined"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value)}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  onClick={handleSecondStep}
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                >
+                  Verify
+                </Button>
+              </Grid>
+            </>
+          )}
         </form>
         <Typography
           variant="body1"
