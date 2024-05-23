@@ -1,5 +1,9 @@
 # Teams-Players-Manager
 
+![JS](https://shields.io/badge/JavaScript-F7DF1E?logo=JavaScript&logoColor=000&style=flat-square)
+![TS](https://shields.io/badge/TypeScript-3178C6?logo=TypeScript&logoColor=FFF&style=flat-square)
+![React]([https://img.shields.io/badge/Qt-5.15-green](https://shields.io/badge/react-black?logo=react&style=for-the-badge))
+
 A web application for managing football teams and players.
 
 ## Front-End
