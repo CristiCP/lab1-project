@@ -6,7 +6,7 @@ A web application for managing football teams and players.
 Built with React and TypeScript
 
 ## Back-End
-Powered by Node.js
+Powered by Node.js + MySQL
 
 ## Installation
 To install the project, follow these steps:
@@ -19,8 +19,11 @@ To install the project, follow these steps:
    ```bash
    npm install / yarn install
    ```
+   
+Note: Before proceeding, ensure you have configured the database.
+
 ## Running the Project
-1. Fron-End - use the command :
+1. Fron-End - Navigate to the 'frontend' folder and use the command:
    ```bash
    npm run dev / yarn dev
    ```
