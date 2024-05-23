@@ -3,12 +3,15 @@
 A web application for managing football teams and players.
 
 ## Front-End
+
 Built with React and TypeScript
 
 ## Back-End
+
 Powered by Node.js + MySQL
 
 ## Installation
+
 To install the project, follow these steps:
 
 1. Clone the repository:
@@ -19,11 +22,12 @@ To install the project, follow these steps:
    ```bash
    npm install / yarn install
    ```
-   
-Note: Before proceeding, ensure you have configured the database.
+
+Note: Before proceeding, ensure you have configured the database and the e-mail sender in `Backend/Controllers/authentificationControllers.js`.
 
 ## Running the Project
-1. Fron-End - Navigate to the 'frontend' folder and use the command:
+
+1. Fron-End - use the command:
    ```bash
    npm run dev / yarn dev
    ```

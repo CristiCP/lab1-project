@@ -11,8 +11,8 @@ module.exports = function(db) {
         port: 587,
         secure: false,
         auth: {
-            user: 'cristipopan1262@gmail.com',
-            pass: 'gsoi ifmp ngws spso'
+            user: 'youremail@gmail.com',
+            pass: 'yourpassword'
         }
     });
 
@@ -20,7 +20,7 @@ module.exports = function(db) {
         const validationLink = `http://localhost:5173/validation?token=${token}`;
         
         const mailOptions = {
-            from: 'cristipopan1262@gmail.com',
+            from: 'youremail@gmail.com',
             to: email,
             subject: 'Account Validation',
             html: `Please click the following link to validate your account: <a href="${validationLink}">${validationLink}</a>`
@@ -37,7 +37,7 @@ module.exports = function(db) {
 
     const send2StepsEmail = (email,code) => {
         const mailOptions = {
-            from: 'cristipopan1262@gmail.com',
+            from: 'youremail@gmail.com',
             to: email,
             subject: 'Account Verify',
             html: `Please use the following code to verify your account: <b>${code}</b>`
